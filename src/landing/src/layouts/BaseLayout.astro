@@ -1,0 +1,26 @@
+---
+import SeoHead from '../components/SeoHead.astro';
+import Navbar from '../components/Navbar.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "The only app that combines lab-verified nutrition tracking with a personal AI chef and coach portal." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <SeoHead title={title} description={description} />
+  </head>
+  <body class="bg-surface text-text font-sans antialiased overflow-x-hidden min-h-screen flex flex-col relative">
+    <Navbar />
+    
+    <main class="flex-grow">
+      <slot />
+    </main>
+  </body>
+</html>

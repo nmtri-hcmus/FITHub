@@ -1,0 +1,191 @@
+---
+import { Image } from 'astro:assets';
+import heroMockup from '../../assets/hero-mockup.png';
+---
+
+<section class="relative z-20 min-h-[122dvh] md:min-h-[126dvh] flex flex-col overflow-visible pt-24 md:pt-28 pb-0 bg-[#0D2118]">
+  
+
+
+  <!-- ── Background overlays ── -->
+  <div class="absolute inset-0 z-0 bg-[image:var(--background-image-gradient-hero)] opacity-20 pointer-events-none"></div>
+  <div class="absolute inset-0 z-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+  <!-- ── Centered Hero Image (absolutely behind content, no masking) ── -->
+  <div class="absolute inset-x-0 top-[-10vh] md:top-[-5vh] lg:top-0 xl:top-[2vh] z-0 flex justify-center animate-[fadeIn_1s_ease-out_0.5s_forwards] opacity-0 pointer-events-none">
+    <div class="w-full max-w-[1600px] flex justify-center px-4">
+      <Image
+        src={heroMockup}
+        alt="FITHub app interface showing nutrition tracking and AI recipe suggestions"
+        loading="eager"
+        format="webp"
+        fetchpriority="high"
+        class="w-full h-auto object-contain object-top drop-shadow-2xl scale-110 md:scale-100 transform origin-top"
+        widths={[640, 960, 1280, 1600]}
+        sizes="(max-width: 640px) 640px, (max-width: 1024px) 960px, 1280px, 1600px"
+      />
+    </div>
+  </div>
+
+  <!-- ── Main Content Row ── -->
+  <div class="relative z-10 w-full max-w-[1400px] mx-auto px-2 lg:px-0 flex flex-col md:flex-row justify-between items-start pb-12">
+
+    <!-- Left Column: Typography & CTAs -->
+    <div class="w-full md:w-[75%] lg:w-[70%] xl:w-[65%] flex flex-col items-start text-left pt-0 md:pt-4 pl-0">
+      
+      <!-- Feature Topic Pills -->
+      <div class="flex flex-wrap items-center gap-2 mb-6 mt-10 md:mt-16 animate-[fadeInUp_0.6s_ease-out_forwards] opacity-0">
+        <a href="#blogs/strength" class="inline-flex items-center px-3 py-1 rounded-full border border-white/20 text-sm font-medium text-white/70 hover:border-white/40 hover:text-white transition-colors cursor-pointer">
+          <span class="w-1.5 h-1.5 rounded-full bg-white/60 mr-2"></span>
+          Strength
+        </a>
+        <a href="#blogs/endurance" class="inline-flex items-center px-3 py-1 rounded-full border border-white/20 text-sm font-medium text-white/70 hover:border-white/40 hover:text-white transition-colors cursor-pointer">
+          <span class="w-1.5 h-1.5 rounded-full bg-white/60 mr-2"></span>
+          Endurance
+        </a>
+        <a href="#blogs/transformation" class="inline-flex items-center px-3 py-1 rounded-full border border-white/20 text-sm font-medium text-white/70 hover:border-white/40 hover:text-white transition-colors cursor-pointer">
+          <span class="w-1.5 h-1.5 rounded-full bg-white/60 mr-2"></span>
+          Transformation
+        </a>
+      </div>
+
+
+      <!-- Headline -->
+      <h1 class="text-5xl sm:text-6xl lg:text-[4rem] font-semibold tracking-tight text-white mb-6 leading-tight drop-shadow-md">
+        <span class="block animate-[fadeInUp_0.6s_ease-out_0.1s_forwards] opacity-0">Precision Nutrition.</span>
+        <span class="block text-primary animate-[fadeInUp_0.6s_ease-out_0.3s_forwards] opacity-0">Ultimate Results.</span>
+      </h1>
+
+      <!-- Sub-headline -->
+      <p class="text-sm md:text-base text-text-muted mb-10 max-w-sm animate-[fadeInUp_0.6s_ease-out_0.4s_forwards] opacity-0 drop-shadow-sm">
+        Unlock results with lab-verified tracking, a personal AI chef, and expert coaches by your side.
+      </p>
+
+      <!-- CTAs -->
+      <div class="w-full max-w-[28rem] animate-[fadeInUp_0.6s_ease-out_0.6s_forwards] opacity-0">
+        <form action="#get-started" class="flex items-center w-full bg-white/5 hover:bg-white/10 focus-within:bg-white/10 rounded-full p-1 transition-all shadow-lg">
+          <input 
+            type="email" 
+            placeholder="Enter your email" 
+            class="flex-1 bg-transparent border-none outline-none text-white placeholder-white/50 px-4 py-2 text-sm w-full"
+            required
+          />
+          <button type="submit" class="bg-white text-gray-900 font-semibold px-4 py-2 rounded-full hover:bg-gray-100 hover:scale-[1.02] active:scale-95 transition-all shadow-sm whitespace-nowrap text-sm">
+            Get Started
+          </button>
+        </form>
+        
+        <div class="mt-5 flex items-center pl-5">
+          <a href="#demo" class="cursor-pointer group flex items-center text-sm text-white/70 hover:text-white font-medium transition-colors">
+            <svg class="w-4 h-4 mr-2 opacity-70 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Watch Demo
+          </a>
+        </div>
+
+        <!-- Meal of the Week Badge -->
+        <div class="inline-flex items-center gap-6 mt-32 px-6 py-1.5 rounded-2xl bg-white/5 animate-[fadeInUp_0.6s_ease-out_0.7s_forwards] opacity-0">
+          <!-- 3 stacked thumbnails -->
+          <div class="flex items-center -space-x-3">
+            <div class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#0D2118] flex-shrink-0 relative z-30" style="background: linear-gradient(135deg, #3a6b4a 0%, #1a3d28 100%);">
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-green-300/60" fill="currentColor" viewBox="0 0 24 24"><path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-4.5-6.72-5-9.52-5S0 10.5 0 14.99v1h16.03v-1z"/></svg>
+              </div>
+            </div>
+            <div class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#0D2118] flex-shrink-0 relative z-20" style="background: linear-gradient(135deg, #2d5a3d 0%, #4a7c5e 100%);">
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-emerald-300/60" fill="currentColor" viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+              </div>
+            </div>
+            <div class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#0D2118] flex-shrink-0 relative z-10" style="background: linear-gradient(135deg, #1e4d32 0%, #3d7554 100%);">
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-teal-300/60" fill="currentColor" viewBox="0 0 24 24"><path d="M18.5 10h-4l-2-8H8L6 10H2l2 8h14.5l2-8zM9.5 4h5l1.5 6h-8L9.5 4zm7 12H7.5l-1-4h11l-1 4z"/></svg>
+              </div>
+            </div>
+          </div>
+          <!-- Text -->
+          <div class="flex flex-col leading-tight pr-4">
+            <span class="text-sm font-semibold text-white/90 whitespace-nowrap">Best Meal of the Week</span>
+            <span class="text-xs text-white/50 mt-0.5 whitespace-nowrap">Voted by users</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Stacked Cards -->
+    <div class="hidden md:flex flex-col gap-4 w-full md:w-[28%] lg:w-[25%] justify-start mt-24 lg:mt-32">
+
+      <!-- AI Insights Card -->
+      <div class="p-7 flex flex-col items-start w-full animate-[fadeInUp_0.8s_ease-out_0.6s_forwards] opacity-0 shadow-2xl relative overflow-hidden rounded-[2rem]" style="background: linear-gradient(135deg, #1a3d28 0%, #0f2518 100%);">
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-secondary/20 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="flex items-center space-x-3 mb-6 relative z-10">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #3a6b4a 0%, #1a3d28 100%);">
+            <svg class="w-5 h-5 text-green-300/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <span class="text-sm font-medium text-white/70 tracking-wide uppercase">AI Insights</span>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-2 relative z-10">Train Hard.<br/>Stay Strong.<br/>Transform Your Life.</h3>
+        <p class="text-text-muted text-sm mb-8 leading-relaxed relative z-10">Personalized workout plans and meal prep generated daily.</p>
+        <a href="#coaches" class="btn-secondary w-full text-center justify-center py-3.5 !rounded-full text-sm font-semibold relative z-10 hover:bg-white/10 transition-colors cursor-pointer">
+          Start Your Journey
+        </a>
+      </div>
+
+      <!-- Membership Plans Card -->
+      <div class="p-6 flex flex-col w-full animate-[fadeInUp_0.8s_ease-out_0.8s_forwards] opacity-0 shadow-2xl relative overflow-hidden rounded-[2rem]" style="background: linear-gradient(135deg, #1a3d28 0%, #0f2518 100%);">
+        <h4 class="text-base font-semibold text-white mb-4">Membership Plans</h4>
+        <div class="flex items-end gap-6">
+          <!-- Price -->
+          <div class="flex flex-col">
+            <span class="text-xs text-white/50 mb-1">Starting at</span>
+            <div class="flex items-end gap-1">
+              <span class="text-4xl font-bold text-white">$39</span>
+              <span class="text-sm text-white/50 mb-1">/month</span>
+            </div>
+          </div>
+          <!-- Features -->
+          <ul class="flex flex-col gap-1.5 text-xs text-white/70">
+            <li class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              Unlimited Access
+            </li>
+            <li class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              Expert Coaches
+            </li>
+            <li class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              Group Classes
+            </li>
+            <li class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              Nutrition Support
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+</section>
+
+<style>
+  /* ── Keyframes ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* No masking — image edges are fully crisp */
+</style>
