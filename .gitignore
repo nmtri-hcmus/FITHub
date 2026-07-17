@@ -1,0 +1,67 @@
+# =============================
+# Speckit rules/workflows/skills
+# =============================
+.agent
+
+# =============================
+# macOS SYSTEM FILES
+# =============================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# =============================
+# PYTHON FILES
+# =============================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Environment variables
+*.env
+
+# Byte-compiled / optimized / DLL files
+*.pyo
+*.pyd
+*.dll
+*.so
+*.dylib
+
+# Log files
+*.log
+
+# Cache / build output
+dist/
+build/
+.cache/
+.temp/
+
+# =============================
+# IDE / EDITOR FILES
+# =============================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# =============================
+# BACKUP / MISC
+# =============================
+*.old
+*.orig
+*.backup
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
