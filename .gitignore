@@ -2,6 +2,7 @@
 # Speckit rules/workflows/skills
 # =============================
 .agent
+artifacts/
 
 # =============================
 # macOS SYSTEM FILES
