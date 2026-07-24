@@ -1,0 +1,36 @@
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+
+const app = express();
+const httpServer = createServer(app);
+
+// Enable JSON body parsing for API requests
+app.use(express.json());
+
+// Initialize Socket.io on top of our HTTP server
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*", // We will restrict this in production!
+  }
+});
+
+// A basic health-check endpoint to verify the API is running
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'FITHub API is running smoothly!' });
+});
+
+// Listen for real-time socket connections
+io.on('connection', (socket) => {
+  console.log(`[Socket.io] A user connected: ${socket.id}`);
+  
+  socket.on('disconnect', () => {
+    console.log(`[Socket.io] User disconnected: ${socket.id}`);
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+});
