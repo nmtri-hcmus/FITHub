@@ -1,6 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import authRoutes from './routes/auth.routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -14,6 +16,9 @@ const io = new Server(httpServer, {
     origin: "*", // We will restrict this in production!
   }
 });
+
+// Mount API routes
+app.use('/api/auth', authRoutes);
 
 // A basic health-check endpoint to verify the API is running
 app.get('/api/health', (req, res) => {
