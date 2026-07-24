@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { LoginForm } from '../components/LoginForm';
+---
+
+<BaseLayout 
+  title="Login | FITHub" 
+  description="Sign in to your FITHub account"
+>
+  <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-4">
+    <!-- Back to Home -->
+    <a href="/" class="absolute top-8 left-8 flex items-center text-sm font-medium text-text-muted hover:text-white transition-colors">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Back to Home
+    </a>
+    
+    <!-- Logo -->
+    <div class="mb-8">
+      <span class="text-3xl font-bold tracking-tighter text-white">FIT<span class="text-primary">Hub</span></span>
+    </div>
+
+    <!-- Auth React Island -->
+    <LoginForm client:load />
+  </div>
+</BaseLayout>

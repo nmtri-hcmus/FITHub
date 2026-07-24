@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { DashboardGreeting } from '../components/DashboardGreeting';
+---
+
+<BaseLayout 
+  title="Dashboard | FITHub" 
+  description="Your FITHub Dashboard"
+>
+  <div class="min-h-screen bg-surface pt-20 px-6 md:px-10 pb-16">
+    <div class="max-w-5xl mx-auto">
+      
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-10">
+        <h1 class="text-3xl font-bold text-white">Dashboard</h1>
+        <a href="/" class="text-text-muted hover:text-white transition-colors text-sm font-medium">← Back to Home</a>
+      </div>
+
+      <!-- Dynamic Greeting Island (empty or filled based on survey completion) -->
+      <DashboardGreeting client:load />
+
+    </div>
+  </div>
+</BaseLayout>

@@ -14,6 +14,7 @@
   --color-surface-alt:   #2D2D35; /* Cards, panels */
   --color-surface-raised:#3A3A44; /* Overlays, drawers */
   --color-surface-edge:  #454552; /* Input fields */
+  --color-hero-bg:       #0D2118; /* Hero background green */
 
   /* ----------------------------------------------------------
      2. NEON ACCENT — Vibrant Emerald Green (#D5FF5F)
@@ -56,6 +57,12 @@
     rgba(213, 255, 95, 0.22),
     rgba(213, 255, 95, 0.05),
     transparent 70%
+  );
+
+  --background-image-gradient-forest: linear-gradient(
+    135deg,
+    #1a3d28 0%,
+    #0f2518 100%
   );
 
   --background-image-gradient-trainee: linear-gradient(
@@ -139,8 +146,8 @@
   *, *::before, *::after { box-sizing: border-box; }
   html { scroll-behavior: smooth; text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
   body {
-    background-color: var(--color-surface);
-    color: var(--color-text);
+    background-color: #ffffff;
+    color: #1a1a1a;
     font-family: var(--font-sans);
     font-size: var(--font-size-base);
     line-height: 1.6;
@@ -179,7 +186,7 @@
   }
   .glass-card:hover {
     border-color: var(--color-border-strong);
-    box-shadow: var(--shadow-card), var(--shadow-glow);
+    box-shadow: var(--shadow-card);
   }
   .btn-primary {
     display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
@@ -189,18 +196,18 @@
     color: #14151A; /* Dark surface for contrast on lime green */
     font-weight: 600; font-size: var(--font-size-base);
     cursor: pointer; border: none;
-    box-shadow: var(--shadow-glow);
+    box-shadow: none;
     transition: transform 200ms var(--ease-spring), background-color 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
   }
   .btn-primary:hover {
     background-color: var(--color-primary-light);
-    box-shadow: var(--shadow-glow-intense);
+    box-shadow: none;
     transform: translateY(-1px) scale(1.02);
   }
   .btn-primary:active {
     background-color: var(--color-primary-dark);
     transform: translateY(0) scale(0.99);
-    box-shadow: var(--shadow-glow);
+    box-shadow: none;
   }
   .btn-secondary {
     display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
@@ -210,13 +217,13 @@
     color: var(--color-primary-light);
     font-weight: 600; font-size: var(--font-size-base);
     cursor: pointer; border: 1px solid var(--color-primary);
-    box-shadow: var(--shadow-glow);
+    box-shadow: none;
     transition: transform 200ms var(--ease-spring), background-color 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo), border-color 200ms var(--ease-out-expo);
   }
   .btn-secondary:hover {
     background-color: rgba(213, 255, 95, 0.12);
     border-color: var(--color-primary-light);
-    box-shadow: var(--shadow-glow-intense);
+    box-shadow: none;
     transform: translateY(-1px) scale(1.02);
   }
   .btn-secondary:active { transform: translateY(0) scale(0.99); }
@@ -251,6 +258,6 @@
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes scaleIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
-@keyframes glowPulse { 0%, 100% { box-shadow: var(--shadow-glow); } 50% { box-shadow: var(--shadow-glow-intense); } }
+@keyframes glowPulse { 0%, 100% { box-shadow: none; } 50% { box-shadow: none; } }
 @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
 @keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }

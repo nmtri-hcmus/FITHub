@@ -1,9 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 import heroMockup from '../../assets/hero-mockup.png';
+import { AuthGuardedButton } from '../AuthGuardedButton';
 ---
 
-<section class="relative z-20 min-h-[122dvh] md:min-h-[126dvh] flex flex-col overflow-visible pt-24 md:pt-28 pb-0 bg-[#0D2118]">
+<section class="relative z-20 min-h-[122dvh] md:min-h-[126dvh] flex flex-col overflow-visible pt-24 md:pt-28 pb-0 bg-hero-bg">
   
 
 
@@ -12,7 +13,7 @@ import heroMockup from '../../assets/hero-mockup.png';
   <div class="absolute inset-0 z-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px); background-size: 24px 24px;"></div>
 
   <!-- ── Centered Hero Image (absolutely behind content, no masking) ── -->
-  <div class="absolute inset-x-0 top-[-10vh] md:top-[-5vh] lg:top-0 xl:top-[2vh] z-0 flex justify-center animate-[fadeIn_1s_ease-out_0.5s_forwards] opacity-0 pointer-events-none">
+  <div class="absolute inset-x-0 xl:top-[2vh] z-0 hidden xl:flex justify-center animate-[fadeIn_1s_ease-out_0.5s_forwards] opacity-0 pointer-events-none">
     <div class="w-full max-w-[1600px] flex justify-center px-4">
       <Image
         src={heroMockup}
@@ -28,13 +29,13 @@ import heroMockup from '../../assets/hero-mockup.png';
   </div>
 
   <!-- ── Main Content Row ── -->
-  <div class="relative z-10 w-full max-w-[1400px] mx-auto px-2 lg:px-0 flex flex-col md:flex-row justify-between items-start pb-12">
+  <div class="relative z-10 w-full max-w-[1400px] mx-auto px-4 xl:px-0 flex flex-col xl:flex-row justify-between items-center xl:items-start pb-12">
 
     <!-- Left Column: Typography & CTAs -->
-    <div class="w-full md:w-[75%] lg:w-[70%] xl:w-[65%] flex flex-col items-start text-left pt-0 md:pt-4 pl-0">
+    <div class="w-full xl:w-[65%] max-w-2xl xl:max-w-none mx-auto xl:mx-0 flex flex-col items-center xl:items-start text-center xl:text-left pt-0 md:pt-4 pl-0">
       
       <!-- Feature Topic Pills -->
-      <div class="flex flex-wrap items-center gap-2 mb-6 mt-10 md:mt-16 animate-[fadeInUp_0.6s_ease-out_forwards] opacity-0">
+      <div class="flex flex-wrap items-center justify-center xl:justify-start gap-2 mb-6 mt-10 md:mt-16 animate-[fadeInUp_0.6s_ease-out_forwards] opacity-0">
         <a href="#blogs/strength" class="inline-flex items-center px-3 py-1 rounded-full border border-white/20 text-sm font-medium text-white/70 hover:border-white/40 hover:text-white transition-colors cursor-pointer">
           <span class="w-1.5 h-1.5 rounded-full bg-white/60 mr-2"></span>
           Strength
@@ -57,25 +58,29 @@ import heroMockup from '../../assets/hero-mockup.png';
       </h1>
 
       <!-- Sub-headline -->
-      <p class="text-sm md:text-base text-text-muted mb-10 max-w-sm animate-[fadeInUp_0.6s_ease-out_0.4s_forwards] opacity-0 drop-shadow-sm">
+      <p class="text-sm md:text-base text-text-muted mb-10 max-w-sm mx-auto xl:mx-0 animate-[fadeInUp_0.6s_ease-out_0.4s_forwards] opacity-0 drop-shadow-sm">
         Unlock results with lab-verified tracking, a personal AI chef, and expert coaches by your side.
       </p>
 
       <!-- CTAs -->
-      <div class="w-full max-w-[28rem] animate-[fadeInUp_0.6s_ease-out_0.6s_forwards] opacity-0">
-        <form action="#get-started" class="flex items-center w-full bg-white/5 hover:bg-white/10 focus-within:bg-white/10 rounded-full p-1 transition-all shadow-lg">
+      <div class="w-full max-w-[28rem] mx-auto xl:mx-0 flex flex-col items-center xl:items-start animate-[fadeInUp_0.6s_ease-out_0.6s_forwards] opacity-0">
+        <div class="flex items-center w-full bg-white/5 hover:bg-white/10 focus-within:bg-white/10 rounded-full p-1 transition-all shadow-lg">
           <input 
             type="email" 
             placeholder="Enter your email" 
             class="flex-1 bg-transparent border-none outline-none text-white placeholder-white/50 px-4 py-2 text-sm w-full"
             required
           />
-          <button type="submit" class="bg-white text-gray-900 font-semibold px-4 py-2 rounded-full hover:bg-gray-100 hover:scale-[1.02] active:scale-95 transition-all shadow-sm whitespace-nowrap text-sm">
+          <AuthGuardedButton 
+            client:load
+            targetPath="/dashboard"
+            className="bg-white text-gray-900 font-semibold px-4 py-2 rounded-full hover:bg-gray-100 hover:scale-[1.02] active:scale-95 transition-all shadow-sm whitespace-nowrap text-sm"
+          >
             Get Started
-          </button>
-        </form>
+          </AuthGuardedButton>
+        </div>
         
-        <div class="mt-5 flex items-center pl-5">
+        <div class="mt-5 flex items-center pl-0 xl:pl-5">
           <a href="#demo" class="cursor-pointer group flex items-center text-sm text-white/70 hover:text-white font-medium transition-colors">
             <svg class="w-4 h-4 mr-2 opacity-70 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
@@ -85,7 +90,7 @@ import heroMockup from '../../assets/hero-mockup.png';
         </div>
 
         <!-- Meal of the Week Badge -->
-        <div class="inline-flex items-center gap-6 mt-32 px-6 py-1.5 rounded-2xl bg-white/5 animate-[fadeInUp_0.6s_ease-out_0.7s_forwards] opacity-0">
+        <div class="inline-flex items-center gap-6 mt-16 xl:mt-32 px-6 py-1.5 rounded-2xl bg-white/5 animate-[fadeInUp_0.6s_ease-out_0.7s_forwards] opacity-0">
           <!-- 3 stacked thumbnails -->
           <div class="flex items-center -space-x-3">
             <div class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#0D2118] flex-shrink-0 relative z-30" style="background: linear-gradient(135deg, #3a6b4a 0%, #1a3d28 100%);">
@@ -114,10 +119,10 @@ import heroMockup from '../../assets/hero-mockup.png';
     </div>
 
     <!-- Right Column: Stacked Cards -->
-    <div class="hidden md:flex flex-col gap-4 w-full md:w-[28%] lg:w-[25%] justify-start mt-24 lg:mt-32">
+    <div class="flex flex-col gap-4 w-full max-w-md xl:max-w-none xl:w-[25%] items-center xl:items-start justify-start mt-16 xl:mt-32">
 
       <!-- AI Insights Card -->
-      <div class="p-7 flex flex-col items-start w-full animate-[fadeInUp_0.8s_ease-out_0.6s_forwards] opacity-0 shadow-2xl relative overflow-hidden rounded-[2rem]" style="background: linear-gradient(135deg, #1a3d28 0%, #0f2518 100%);">
+      <div class="p-7 flex flex-col items-start w-full animate-[fadeInUp_0.8s_ease-out_0.6s_forwards] opacity-0 shadow-2xl relative overflow-hidden rounded-[2rem] bg-[image:var(--background-image-gradient-forest)]">
         <div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-secondary/20 rounded-full blur-2xl pointer-events-none"></div>
         <div class="flex items-center space-x-3 mb-6 relative z-10">
@@ -130,13 +135,17 @@ import heroMockup from '../../assets/hero-mockup.png';
         </div>
         <h3 class="text-2xl font-bold text-white mb-2 relative z-10">Train Hard.<br/>Stay Strong.<br/>Transform Your Life.</h3>
         <p class="text-text-muted text-sm mb-8 leading-relaxed relative z-10">Personalized workout plans and meal prep generated daily.</p>
-        <a href="#coaches" class="btn-secondary w-full text-center justify-center py-3.5 !rounded-full text-sm font-semibold relative z-10 hover:bg-white/10 transition-colors cursor-pointer">
+        <AuthGuardedButton 
+          client:load
+          targetPath="#coaches"
+          className="btn-secondary w-full text-center justify-center py-3.5 !rounded-full text-sm font-semibold relative z-10 hover:bg-white/10 transition-colors cursor-pointer flex"
+        >
           Start Your Journey
-        </a>
+        </AuthGuardedButton>
       </div>
 
       <!-- Membership Plans Card -->
-      <div class="p-6 flex flex-col w-full animate-[fadeInUp_0.8s_ease-out_0.8s_forwards] opacity-0 shadow-2xl relative overflow-hidden rounded-[2rem]" style="background: linear-gradient(135deg, #1a3d28 0%, #0f2518 100%);">
+      <div class="p-6 flex flex-col w-full animate-[fadeInUp_0.8s_ease-out_0.8s_forwards] opacity-0 shadow-2xl relative overflow-hidden rounded-[2rem] bg-[image:var(--background-image-gradient-forest)]">
         <h4 class="text-base font-semibold text-white mb-4">Membership Plans</h4>
         <div class="flex items-end gap-6">
           <!-- Price -->
@@ -172,7 +181,23 @@ import heroMockup from '../../assets/hero-mockup.png';
     </div>
   </div>
 
+  <!-- Contact Badge (Bottom Right) -->
+  <div class="absolute bottom-6 right-6 xl:bottom-10 xl:right-10 z-30 hidden md:flex items-center gap-6 animate-[fadeInUp_0.8s_ease-out_1s_forwards] opacity-0">
+    
+    <!-- Call Us -->
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+      <span class="text-sm text-white/50 uppercase tracking-wider">Call Us</span>
+      <span class="text-sm text-white">1900-XXXX</span>
+    </div>
 
+    <!-- Visit Us -->
+    <div class="flex flex-col pr-2">
+      <span class="text-[10px] text-white/50 uppercase tracking-widest mb-0.5">Visit Us</span>
+      <span class="text-white text-sm leading-none">www.fithub.com</span>
+    </div>
+
+  </div>
 
 </section>
 
