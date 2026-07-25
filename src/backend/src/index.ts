@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import progressRoutes from './routes/progress.routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -21,6 +22,7 @@ const io = new Server(httpServer, {
 // Mount API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes); 
+app.use('/api/progress', progressRoutes); 
 
 // A basic health-check endpoint to verify the API is running
 app.get('/api/health', (req, res) => {
