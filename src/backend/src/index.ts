@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import authRoutes from './routes/auth.routes';
@@ -11,6 +12,12 @@ const httpServer = createServer(app);
 
 // Enable JSON body parsing for API requests
 app.use(express.json());
+
+// Allow cross-origin requests from the Astro frontend (port 4321)
+app.use(cors({
+  origin: ['http://localhost:4321', 'http://127.0.0.1:4321'],
+  credentials: true,
+}));
 
 // Initialize Socket.io on top of our HTTP server
 const io = new Server(httpServer, {

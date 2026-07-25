@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  calculateMacros,
   ACTIVITY_LABELS,
   GOAL_LABELS,
   type BiometricInput,
@@ -9,6 +8,7 @@ import {
   type Gender,
   type MedicalCondition,
 } from '../lib/macroCalc';
+import { api, mapGender, mapGoal, mapActivity } from '../lib/api';
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
@@ -92,6 +92,8 @@ export const OnboardingSurvey: React.FC = () => {
   const [goal, setGoal]               = useState<FitnessGoal>('maintain');
   const [activity, setActivity]       = useState<ActivityLevel>('moderate');
   const [conditions, setConditions]   = useState<MedicalCondition[]>(['none']);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError]             = useState('');
 
   const toggleCondition = (val: MedicalCondition) => {
     if (val === 'none') {
@@ -111,22 +113,33 @@ export const OnboardingSurvey: React.FC = () => {
 
   const handleBack = () => setStep(s => Math.max(s - 1, 1));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const input: BiometricInput = {
-      age:               Number(age),
-      gender,
-      weightKg:          Number(weightKg),
-      heightCm:          Number(heightCm),
-      bodyFatPercent:    bodyFat ? Number(bodyFat) : undefined,
-      goal,
-      activityLevel:     activity,
-      medicalConditions: conditions,
-    };
-    const macros = calculateMacros(input);
-    const payload = { input, macros, completedAt: new Date().toISOString() };
-    localStorage.setItem('fithub_mock_biometrics', JSON.stringify(payload));
-    window.location.href = '/dashboard';
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      // Map frontend enums → backend Prisma enums
+      const payload = {
+        height: Number(heightCm),
+        weight: Number(weightKg),
+        age: Number(age),
+        gender: mapGender(gender),
+        activityLevel: mapActivity(activity),
+        goal: mapGoal(goal),
+      };
+
+      // Send to the backend — it calculates the macros and saves to DB
+      const biometrics = await api.users.onboard(payload);
+
+      // Cache in localStorage for the Dashboard to read immediately on next page
+      localStorage.setItem('fithub_biometrics', JSON.stringify(biometrics));
+
+      window.location.href = '/dashboard';
+    } catch (err: any) {
+      setError(err.message || 'Failed to save your profile. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   // ── Step renders ────────────────────────────────────────────────────────────
@@ -157,7 +170,7 @@ export const OnboardingSurvey: React.FC = () => {
         </div>
       </Field>
 
-      <NavButtons step={step} total={TOTAL_STEPS} onBack={handleBack} isLast={false} />
+      <NavButtons step={step} total={TOTAL_STEPS} onBack={handleBack} isLast={false} isSubmitting={false} />
     </form>
   );
 
@@ -188,7 +201,7 @@ export const OnboardingSurvey: React.FC = () => {
         />
       </Field>
 
-      <NavButtons step={step} total={TOTAL_STEPS} onBack={handleBack} isLast={false} />
+      <NavButtons step={step} total={TOTAL_STEPS} onBack={handleBack} isLast={false} isSubmitting={false} />
     </form>
   );
 
@@ -231,7 +244,7 @@ export const OnboardingSurvey: React.FC = () => {
         </div>
       </Field>
 
-      <NavButtons step={step} total={TOTAL_STEPS} onBack={handleBack} isLast={false} />
+      <NavButtons step={step} total={TOTAL_STEPS} onBack={handleBack} isLast={false} isSubmitting={false} />
     </form>
   );
 
@@ -263,7 +276,13 @@ export const OnboardingSurvey: React.FC = () => {
         </div>
       </Field>
 
-      <NavButtons step={step} total={TOTAL_STEPS} onBack={handleBack} isLast={true} />
+      {error && (
+        <div className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+          {error}
+        </div>
+      )}
+
+      <NavButtons step={step} total={TOTAL_STEPS} onBack={handleBack} isLast={true} isSubmitting={isSubmitting} />
     </form>
   );
 
@@ -291,8 +310,9 @@ interface NavButtonsProps {
   total: number;
   onBack: () => void;
   isLast: boolean;
+  isSubmitting: boolean;
 }
-const NavButtons: React.FC<NavButtonsProps> = ({ step, onBack, isLast }) => (
+const NavButtons: React.FC<NavButtonsProps> = ({ step, onBack, isLast, isSubmitting }) => (
   <div className="flex gap-3 pt-2">
     {step > 1 && (
       <button type="button" onClick={onBack}
@@ -301,9 +321,14 @@ const NavButtons: React.FC<NavButtonsProps> = ({ step, onBack, isLast }) => (
         Back
       </button>
     )}
-    <button type="submit"
-      className="flex-1 bg-primary text-surface font-bold py-3.5 rounded-xl hover:bg-primary-light transition-colors"
+    <button
+      type="submit"
+      disabled={isSubmitting}
+      className="flex-1 bg-primary text-surface font-bold py-3.5 rounded-xl hover:bg-primary-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
     >
+      {isSubmitting && (
+        <div className="w-4 h-4 border-2 border-surface border-t-transparent rounded-full animate-spin" />
+      )}
       {isLast ? 'Calculate My Macros →' : 'Next →'}
     </button>
   </div>

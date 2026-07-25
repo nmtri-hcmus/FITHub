@@ -11,32 +11,40 @@ const LoginFormInner: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Simple mock logic
-    const mockUser = {
-      id: 'usr_123',
-      email,
-      displayName: email.split('@')[0],
-      role: 'TRAINEE' as const
-    };
+    setError('');
 
-    if (isLoginView) {
-      login(mockUser);
-      // Smart Post-Auth Redirect Logic for Login
-      const target = sessionStorage.getItem('fithub_redirect_target');
-      if (target) {
-        sessionStorage.removeItem('fithub_redirect_target');
-        window.location.href = target;
+    if (!isLoginView && password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (isLoginView) {
+        await login(email, password);
+        // Smart Post-Auth Redirect Logic for Login
+        const target = sessionStorage.getItem('fithub_redirect_target');
+        if (target) {
+          sessionStorage.removeItem('fithub_redirect_target');
+          window.location.href = target;
+        } else {
+          window.location.href = '/dashboard';
+        }
       } else {
-        window.location.href = '/dashboard';
+        const name = `${firstName} ${lastName}`.trim() || username || email.split('@')[0];
+        await register(email, password, name);
+        // New users always go to survey first
+        window.location.href = '/survey';
       }
-    } else {
-      register(mockUser);
-      // Smart Post-Auth Redirect Logic for Register
-      window.location.href = '/survey';
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -50,6 +58,13 @@ const LoginFormInner: React.FC = () => {
       <p className="text-text-muted text-sm mb-8 relative z-10">
         {isLoginView ? 'Enter your details to proceed.' : 'Create an account to start your journey.'}
       </p>
+
+      {/* Error Banner */}
+      {error && (
+        <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm relative z-10">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10">
         {!isLoginView && (
@@ -88,7 +103,6 @@ const LoginFormInner: React.FC = () => {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
-                required={!isLoginView}
                 className="w-full bg-surface/50 border border-surface-edge rounded-xl pl-9 pr-4 py-3 text-white placeholder-text-muted focus:outline-none focus:border-primary transition-colors"
                 placeholder="unique_username"
               />
@@ -156,8 +170,12 @@ const LoginFormInner: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-primary text-surface font-semibold py-3.5 rounded-xl hover:bg-primary-light transition-colors mt-2"
+          disabled={isSubmitting}
+          className="w-full bg-primary text-surface font-semibold py-3.5 rounded-xl hover:bg-primary-light transition-colors mt-2 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
+          {isSubmitting && (
+            <div className="w-4 h-4 border-2 border-surface border-t-transparent rounded-full animate-spin" />
+          )}
           {isLoginView ? 'Sign In' : 'Sign Up'}
         </button>
 
@@ -187,7 +205,7 @@ const LoginFormInner: React.FC = () => {
 
       <div className="mt-8 text-center relative z-10">
         <button 
-          onClick={() => setIsLoginView(!isLoginView)}
+          onClick={() => { setIsLoginView(!isLoginView); setError(''); }}
           className="text-sm text-text-muted hover:text-white transition-colors"
         >
           {isLoginView ? "Need an account? Sign up" : "Already have an account? Sign in"}

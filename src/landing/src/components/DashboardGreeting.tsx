@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from '../context/AuthContext';
-import type { MacroResult } from '../lib/macroCalc';
+import type { BiometricsResponse } from '../lib/api';
+import { api } from '../lib/api';
 
-interface StoredBiometrics {
-  input: {
-    age: number;
-    gender: string;
-    weightKg: number;
-    heightCm: number;
-    goal: string;
-    activityLevel: string;
-    medicalConditions: string[];
-  };
-  macros: MacroResult;
-  completedAt: string;
-}
+const GOAL_DISPLAY: Record<string, string> = {
+  LOSE_WEIGHT: '🔥 Cutting — Fat Loss',
+  MAINTAIN: '⚖️ Maintaining — Body Recomp',
+  BUILD_MUSCLE: '💪 Bulking — Muscle Gain',
+};
 
 interface StatTileProps {
   label: string;
@@ -30,30 +23,48 @@ const StatTile: React.FC<StatTileProps> = ({ label, value, unit, color = 'text-p
   </div>
 );
 
-const GOAL_DISPLAY: Record<string, string> = {
-  cut: '🔥 Cutting — Fat Loss',
-  maintain: '⚖️ Maintaining — Body Recomp',
-  bulk: '💪 Bulking — Muscle Gain',
-};
-
 const DashboardGreetingInner: React.FC = () => {
   const { user, isLoading } = useAuth();
-  const [biometrics, setBiometrics] = useState<StoredBiometrics | null>(null);
+  const [biometrics, setBiometrics] = useState<BiometricsResponse | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem('fithub_mock_biometrics');
-    if (stored) {
+
+    // First try the localStorage cache for instant render
+    const cached = localStorage.getItem('fithub_biometrics');
+    if (cached) {
       try {
-        setBiometrics(JSON.parse(stored));
+        setBiometrics(JSON.parse(cached));
+        setIsFetching(false);
+        return;
       } catch {
-        // ignore parse errors
+        // ignore parse errors, fall through to API fetch
       }
     }
+
+    // If no cache, fetch fresh from the API
+    const token = localStorage.getItem('fithub_token');
+    if (!token) {
+      setIsFetching(false);
+      return;
+    }
+
+    api.users.me()
+      .then((profile) => {
+        if (profile.biometrics) {
+          setBiometrics(profile.biometrics);
+          localStorage.setItem('fithub_biometrics', JSON.stringify(profile.biometrics));
+        }
+      })
+      .catch(() => {
+        // User might not have biometrics yet — that's OK
+      })
+      .finally(() => setIsFetching(false));
   }, []);
 
-  if (!mounted || isLoading) {
+  if (!mounted || isLoading || isFetching) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
@@ -61,7 +72,7 @@ const DashboardGreetingInner: React.FC = () => {
     );
   }
 
-  // ── EMPTY STATE (survey skipped) ────────────────────────────────────────────
+  // ── EMPTY STATE (survey skipped or not yet done) ─────────────────────────────
   if (!biometrics) {
     return (
       <div className="bg-surface-alt rounded-[2rem] p-10 md:p-16 border border-surface-edge relative overflow-hidden flex flex-col items-center text-center shadow-2xl">
@@ -91,10 +102,9 @@ const DashboardGreetingInner: React.FC = () => {
     );
   }
 
-  // ── FILLED STATE (survey completed) ─────────────────────────────────────────
-  const { macros, input } = biometrics;
+  // ── FILLED STATE (biometrics loaded from real DB) ───────────────────────────
   const displayName = user?.displayName ?? 'Athlete';
-  const goal = GOAL_DISPLAY[input.goal] ?? input.goal;
+  const goal = GOAL_DISPLAY[biometrics.goal] ?? biometrics.goal;
 
   return (
     <div className="flex flex-col gap-6">
@@ -114,25 +124,25 @@ const DashboardGreetingInner: React.FC = () => {
       <div>
         <h3 className="text-xs font-bold uppercase tracking-wider text-text-subtle mb-4">Your Daily Macro Targets</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatTile label="Calories"   value={macros.calories} unit="kcal"  color="text-primary" />
-          <StatTile label="Protein"    value={macros.protein}  unit="g"     color="text-blue-400" />
-          <StatTile label="Carbs"      value={macros.carbs}    unit="g"     color="text-yellow-400" />
-          <StatTile label="Fat"        value={macros.fat}      unit="g"     color="text-orange-400" />
+          <StatTile label="Calories" value={biometrics.dailyCalories} unit="kcal"  color="text-primary" />
+          <StatTile label="Protein"  value={biometrics.protein}       unit="g"     color="text-blue-400" />
+          <StatTile label="Carbs"    value={biometrics.carbs}         unit="g"     color="text-yellow-400" />
+          <StatTile label="Fat"      value={biometrics.fat}           unit="g"     color="text-orange-400" />
         </div>
       </div>
 
       {/* Biometric Summary */}
       <div className="bg-surface-alt rounded-2xl border border-surface-edge p-6 grid grid-cols-3 gap-4 text-center">
         <div>
-          <p className="text-lg font-bold text-white">{input.weightKg} kg</p>
+          <p className="text-lg font-bold text-white">{biometrics.weight} kg</p>
           <p className="text-xs text-text-subtle mt-0.5">Body Weight</p>
         </div>
         <div>
-          <p className="text-lg font-bold text-white">{input.heightCm} cm</p>
+          <p className="text-lg font-bold text-white">{biometrics.height} cm</p>
           <p className="text-xs text-text-subtle mt-0.5">Height</p>
         </div>
         <div>
-          <p className="text-lg font-bold text-white">{input.age} yrs</p>
+          <p className="text-lg font-bold text-white">{biometrics.age} yrs</p>
           <p className="text-xs text-text-subtle mt-0.5">Age</p>
         </div>
       </div>

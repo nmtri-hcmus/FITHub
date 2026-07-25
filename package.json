@@ -1,0 +1,11 @@
+{
+  "name": "fithub",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "backend": "npm run dev --prefix src/backend",
+    "frontend": "npm run dev --prefix src/landing",
+    "dev:backend": "npm run dev --prefix src/backend",
+    "dev:frontend": "npm run dev --prefix src/landing"
+  }
+}
