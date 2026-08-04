@@ -7,11 +7,5 @@
     "frontend": "npm run dev --prefix src/landing",
     "dev:backend": "npm run dev --prefix src/backend",
     "dev:frontend": "npm run dev --prefix src/landing"
-  },
-  "dependencies": {
-    "bcryptjs": "^3.0.3"
-  },
-  "devDependencies": {
-    "@types/bcryptjs": "^2.4.6"
   }
 }
