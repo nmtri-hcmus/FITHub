@@ -6,6 +6,8 @@ import { Server } from 'socket.io';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import progressRoutes from './routes/progress.routes';
+import foodRoutes from './routes/food.routes';
+import mealsRoutes from './routes/meals.routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -13,23 +15,29 @@ const httpServer = createServer(app);
 // Enable JSON body parsing for API requests
 app.use(express.json());
 
-// Allow cross-origin requests from the Astro frontend (port 4321)
+// Allowed origins: reads from FRONTEND_URL env var in production, falls back to localhost for local dev
+const allowedOrigins = process.env.FRONTEND_URL
+  ? [process.env.FRONTEND_URL, 'http://localhost:4321', 'http://127.0.0.1:4321']
+  : ['http://localhost:4321', 'http://127.0.0.1:4321'];
+
 app.use(cors({
-  origin: ['http://localhost:4321', 'http://127.0.0.1:4321'],
+  origin: allowedOrigins,
   credentials: true,
 }));
 
 // Initialize Socket.io on top of our HTTP server
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // We will restrict this in production!
+    origin: allowedOrigins,
   }
 });
 
 // Mount API routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes); 
-app.use('/api/progress', progressRoutes); 
+app.use('/api/users', userRoutes);
+app.use('/api/progress', progressRoutes);
+app.use('/api/food', foodRoutes);
+app.use('/api/meals', mealsRoutes);
 
 // A basic health-check endpoint to verify the API is running
 app.get('/api/health', (req, res) => {

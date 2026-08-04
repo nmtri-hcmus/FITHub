@@ -4,7 +4,7 @@
  * Auto-attaches the JWT token and handles errors consistently.
  */
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 function getToken(): string | null {
   return localStorage.getItem('fithub_token');
@@ -86,6 +86,23 @@ export const api = {
 
     history: () => request('/api/progress/history'),
   },
+
+  food: {
+    search: (q: string) => request<FoodSearchResult[]>(`/api/food/search?q=${encodeURIComponent(q)}`),
+    barcode: (code: string) => request<FoodSearchResult>(`/api/food/barcode/${code}`),
+  },
+
+  meals: {
+    log: (data: LogMealInput) =>
+      request<MealLog>('/api/meals/log', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    getDaily: (date: string) => request<MealLog[]>(`/api/meals/daily?date=${date}`),
+    getDashboard: (date: string) => request<DailyDashboard>(`/api/meals/dashboard?date=${date}`),
+    delete: (id: string) =>
+      request(`/api/meals/${id}`, { method: 'DELETE' }),
+  },
 };
 
 // ── Types for API responses ───────────────────────────────────────────────────
@@ -111,6 +128,50 @@ export interface BiometricsResponse {
   protein: number;
   carbs: number;
   fat: number;
+}
+
+export interface FoodSearchResult {
+  id: string;
+  name: string;
+  brand?: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  servingSize: string;
+  imageUrl?: string;
+}
+
+export type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK';
+
+export interface LogMealInput {
+  date: string;           // YYYY-MM-DD
+  mealType: MealType;
+  foodItemName: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+export interface MealLog extends LogMealInput {
+  id: string;
+  userId: string;
+  createdAt: string;
+}
+
+export interface MacroTotals {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+export interface DailyDashboard {
+  date: string;
+  consumed: MacroTotals;
+  targets: MacroTotals | null;
+  meals: MealLog[];
 }
 
 // ── Enum mapping: frontend shorthand → backend Prisma enums ──────────────────
