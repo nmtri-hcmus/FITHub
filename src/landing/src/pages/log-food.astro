@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { NutritionTracker } from '../components/NutritionTracker';
+---
+
+<BaseLayout
+  title="Log Food | FITHub"
+  description="Track your daily nutrition, log meals, and monitor your macro progress on FITHub."
+>
+  <div class="min-h-screen bg-surface pt-20 px-6 md:px-10 pb-20">
+    <div class="max-w-3xl mx-auto">
+
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-white">Food Diary</h1>
+          <p class="text-text-muted text-sm mt-1">Track what you eat, hit your macros.</p>
+        </div>
+        <a href="/dashboard" class="text-text-muted hover:text-white transition-colors text-sm font-medium">
+          ← Dashboard
+        </a>
+      </div>
+
+      <!-- Nutrition Tracker Island -->
+      <NutritionTracker client:load />
+
+    </div>
+  </div>
+</BaseLayout>

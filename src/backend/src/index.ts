@@ -12,8 +12,8 @@ import mealsRoutes from './routes/meals.routes';
 const app = express();
 const httpServer = createServer(app);
 
-// Enable JSON body parsing for API requests
-app.use(express.json());
+// Enable JSON body parsing for API requests (increased limit for Base64 image uploads)
+app.use(express.json({ limit: '50mb' }));
 
 // Allowed origins: reads from FRONTEND_URL env var in production, falls back to localhost for local dev
 const allowedOrigins = process.env.FRONTEND_URL

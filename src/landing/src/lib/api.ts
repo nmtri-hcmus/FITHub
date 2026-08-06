@@ -30,6 +30,11 @@ async function request<T>(
     headers,
   });
 
+  // 204 No Content (e.g. DELETE) has no body — skip JSON parsing
+  if (res.status === 204 || res.status === 205) {
+    return undefined as T;
+  }
+
   const data = await res.json();
 
   if (!res.ok) {
@@ -78,13 +83,13 @@ export const api = {
   },
 
   progress: {
-    log: (bodyWeight: number, bodyFatPercent?: number) =>
-      request('/api/progress/log', {
+    log: (bodyWeight: number, bodyFatPercent?: number, photoUrl?: string) =>
+      request<ProgressLog>('/api/progress/log', {
         method: 'POST',
-        body: JSON.stringify({ bodyWeight, bodyFatPercent }),
+        body: JSON.stringify({ bodyWeight, bodyFatPercent, photoUrl }),
       }),
 
-    history: () => request('/api/progress/history'),
+    history: () => request<ProgressLog[]>('/api/progress/history'),
   },
 
   food: {
@@ -172,6 +177,16 @@ export interface DailyDashboard {
   consumed: MacroTotals;
   targets: MacroTotals | null;
   meals: MealLog[];
+}
+
+export interface ProgressLog {
+  id: string;
+  userId: string;
+  bodyWeight: number;
+  bodyFatPercent?: number;
+  photoUrl?: string;
+  date: string;
+  createdAt: string;
 }
 
 // ── Enum mapping: frontend shorthand → backend Prisma enums ──────────────────
