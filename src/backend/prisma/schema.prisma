@@ -22,8 +22,10 @@ model User {
 
   biometrics    UserBiometrics?
   progressLogs  ProgressLog[]
-  mealLogs      MealLog[]
-  refreshTokens RefreshToken[]
+  mealLogs        MealLog[]
+  refreshTokens   RefreshToken[]
+  recipes         Recipe[]
+  calendarEntries DietCalendarEntry[]
 }
 
 enum Role {
@@ -110,6 +112,54 @@ model MealLog {
   fat          Float
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([userId, date])
+}
+
+enum RecipeStatus {
+  PRIVATE
+  PENDING
+  APPROVED
+}
+
+model Recipe {
+  id           String             @id @default(uuid())
+  userId       String
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeName   String
+  instructions String             @db.Text
+  calories     Float
+  protein      Float
+  carbs        Float
+  fat          Float
+  status       RecipeStatus       @default(PRIVATE)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  ingredients     RecipeIngredient[]
+  calendarEntries DietCalendarEntry[]
+}
+
+model RecipeIngredient {
+  id             String   @id @default(uuid())
+  recipeId       String
+  recipe         Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredientName String
+  quantity       String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model DietCalendarEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId  String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  date      DateTime
+  mealType  MealType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, date])
 }

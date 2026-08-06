@@ -8,6 +8,9 @@ import userRoutes from './routes/user.routes';
 import progressRoutes from './routes/progress.routes';
 import foodRoutes from './routes/food.routes';
 import mealsRoutes from './routes/meals.routes';
+import recipeRoutes from './routes/recipe.routes';
+import calendarRoutes from './routes/calendar.routes';
+import aiRoutes from './routes/ai.routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -38,6 +41,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/food', foodRoutes);
 app.use('/api/meals', mealsRoutes);
+app.use('/api/recipes', recipeRoutes);
+app.use('/api/calendar', calendarRoutes);
+app.use('/api/ai', aiRoutes);
 
 // A basic health-check endpoint to verify the API is running
 app.get('/api/health', (req, res) => {
