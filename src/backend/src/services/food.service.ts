@@ -19,7 +19,7 @@ export const FoodService = {
           search_simple: 1,
           action: 'process',
           json: 1,
-          page_size: 20
+          page_size: 50   // Fetch more to compensate for quality filtering below
         },
         timeout: 5000, // 5 seconds timeout
         httpsAgent
@@ -29,17 +29,37 @@ export const FoodService = {
         return [];
       }
 
-      return response.data.products.map((p: any) => ({
-        id: p.code,
-        name: p.product_name,
-        brand: p.brands,
-        calories: p.nutriments?.['energy-kcal_100g'] || 0,
-        protein: p.nutriments?.proteins_100g || 0,
-        carbs: p.nutriments?.carbohydrates_100g || 0,
-        fat: p.nutriments?.fat_100g || 0,
-        servingSize: p.serving_size || '100g',
-        imageUrl: p.image_url
-      }));
+      const results = response.data.products
+        // Step 1: Filter out products with no name or incomplete nutritional data
+        .filter((p: any) => {
+          const name = (p.product_name || '').trim();
+          // Must have a real name
+          if (!name) return false;
+          // Must have at least some caloric value (ignore condiments, spices, water, etc.)
+          const kcal =
+            p.nutriments?.['energy-kcal_100g'] ??
+            p.nutriments?.['energy-kcal_serving'] ??
+            0;
+          if (kcal <= 0) return false;
+          return true;
+        })
+        // Step 2: Map to our clean schema
+        .map((p: any) => ({
+          id: p.code,
+          name: p.product_name.trim(),
+          brand: p.brands || undefined,
+          calories:
+            p.nutriments?.['energy-kcal_100g'] ??
+            p.nutriments?.['energy-kcal_serving'] ??
+            0,
+          protein: p.nutriments?.proteins_100g ?? 0,
+          carbs: p.nutriments?.carbohydrates_100g ?? 0,
+          fat: p.nutriments?.fat_100g ?? 0,
+          servingSize: p.serving_size || '100g',
+          imageUrl: p.image_url || undefined,
+        }));
+
+      return results;
     } catch (error) {
       console.warn('⚠️ Open Food Facts API failed (likely local DNS issue). Returning fallback mock data.', error);
       // Fallback mock data so local development and frontend UI work can continue
