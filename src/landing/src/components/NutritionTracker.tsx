@@ -16,6 +16,54 @@ const toLocalDate = (d: Date | string) => {
     .split('T')[0];
 };
 
+// ── Over-target warning banner (UC-05 A1) ────────────────────────────────────
+interface OverTargetWarningProps {
+  consumed: { calories: number; protein: number; carbs: number; fat: number };
+  targets: { calories: number; protein: number; carbs: number; fat: number };
+}
+
+const OverTargetWarning: React.FC<OverTargetWarningProps> = ({ consumed, targets }) => {
+  const overMacros: string[] = [];
+  if (consumed.calories > targets.calories) overMacros.push(`calories (+${Math.round(consumed.calories - targets.calories)} kcal)`);
+  if (consumed.protein  > targets.protein)  overMacros.push(`protein (+${(consumed.protein - targets.protein).toFixed(1)}g)`);
+  if (consumed.carbs    > targets.carbs)    overMacros.push(`carbs (+${(consumed.carbs - targets.carbs).toFixed(1)}g)`);
+  if (consumed.fat      > targets.fat)      overMacros.push(`fat (+${(consumed.fat - targets.fat).toFixed(1)}g)`);
+
+  if (overMacros.length === 0) return null;
+
+  return (
+    <div className="flex items-start gap-3 bg-red-950/40 border border-red-500/30 rounded-2xl p-4">
+      <div className="shrink-0 w-9 h-9 rounded-full bg-red-500/20 flex items-center justify-center text-lg">⚠️</div>
+      <div>
+        <p className="text-red-300 font-bold text-sm">Daily target exceeded</p>
+        <p className="text-red-400/80 text-xs mt-0.5">
+          You've gone over your {overMacros.join(', ')} target{overMacros.length > 1 ? 's' : ''} for today.
+          Consider lighter options for your remaining meals.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// ── Empty state for a date with no meals (UC-05 A3) ───────────────────────────
+interface EmptyDayStateProps {
+  isToday: boolean;
+}
+
+const EmptyDayState: React.FC<EmptyDayStateProps> = ({ isToday }) => (
+  <div className="flex flex-col items-center text-center py-10 px-6">
+    <div className="w-20 h-20 rounded-full bg-surface-alt border border-surface-edge flex items-center justify-center text-4xl mb-5">🍽️</div>
+    <h3 className="text-white font-bold text-lg mb-1">
+      {isToday ? 'Nothing logged yet today' : 'No meals logged this day'}
+    </h3>
+    <p className="text-text-muted text-sm max-w-xs">
+      {isToday
+        ? 'Tap "+ Add" on any meal section below to start tracking your nutrition.'
+        : 'No food entries were recorded for this date.'}
+    </p>
+  </div>
+);
+
 const NutritionTrackerInner: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [dashboard, setDashboard] = useState<DailyDashboard | null>(null);
@@ -47,9 +95,10 @@ const NutritionTrackerInner: React.FC = () => {
   const targets = dashboard?.targets ?? null;
 
   const getMealsForType = (type: MealType) =>
-    (dashboard?.meals ?? []).filter(
-      (m) => m.mealType === type
-    );
+    (dashboard?.meals ?? []).filter((m) => m.mealType === type);
+
+  const totalMealsLogged = (dashboard?.meals ?? []).length;
+  const isToday = selectedDate === todayStr();
 
   return (
     <div className="flex flex-col gap-6">
@@ -79,6 +128,11 @@ const NutritionTrackerInner: React.FC = () => {
         </div>
       ) : (
         <>
+          {/* UC-05 A1 — Over-target warning */}
+          {targets && (
+            <OverTargetWarning consumed={consumed} targets={targets} />
+          )}
+
           {/* Macro Summary Card */}
           <div className="bg-[image:var(--background-image-gradient-forest)] rounded-2xl border border-surface-edge p-6">
             {!targets ? (
@@ -128,6 +182,11 @@ const NutritionTrackerInner: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* UC-05 A3 — Empty state */}
+          {totalMealsLogged === 0 && (
+            <EmptyDayState isToday={isToday} />
+          )}
 
           {/* Meal sections */}
           <div className="flex flex-col gap-3">

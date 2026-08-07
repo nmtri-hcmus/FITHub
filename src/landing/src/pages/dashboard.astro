@@ -23,24 +23,56 @@ import { ProgressTracker } from '../components/ProgressTracker';
       <!-- Progress Tracking Island -->
       <ProgressTracker client:load />
 
-      <!-- Quick Link: Food Diary -->
-      <a
-        href="/log-food"
-        class="mt-10 flex items-center justify-between bg-surface-alt hover:bg-surface border border-surface-edge hover:border-primary/30 rounded-2xl p-5 group transition-all"
-      >
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl">
-            🍽️
+      <!-- Quick Links Grid -->
+      <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Quick Link: Food Diary -->
+        <a
+          href="/log-food"
+          class="flex items-center justify-between bg-surface-alt hover:bg-surface border border-surface-edge hover:border-primary/30 rounded-2xl p-5 group transition-all"
+        >
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl">
+              🍽️
+            </div>
+            <div>
+              <p class="text-white font-bold">Food Diary</p>
+              <p class="text-text-muted text-xs mt-0.5">Log daily meals</p>
+            </div>
           </div>
-          <div>
-            <p class="text-white font-bold">Food Diary</p>
-            <p class="text-text-muted text-sm">Log meals & track your daily macros</p>
+        </a>
+
+        <!-- Quick Link: Diet Plan -->
+        <a
+          href="/diet-plan"
+          class="flex items-center justify-between bg-surface-alt hover:bg-surface border border-surface-edge hover:border-primary/30 rounded-2xl p-5 group transition-all"
+        >
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl">
+              📅
+            </div>
+            <div>
+              <p class="text-white font-bold">Weekly Plan</p>
+              <p class="text-text-muted text-xs mt-0.5">Schedule meals</p>
+            </div>
           </div>
-        </div>
-        <svg class="w-5 h-5 text-text-muted group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>
+        </a>
+
+        <!-- Quick Link: Recipes -->
+        <a
+          href="/recipes"
+          class="flex items-center justify-between bg-surface-alt hover:bg-surface border border-surface-edge hover:border-primary/30 rounded-2xl p-5 group transition-all"
+        >
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl">
+              🍳
+            </div>
+            <div>
+              <p class="text-white font-bold">Recipes</p>
+              <p class="text-text-muted text-xs mt-0.5">Browse & Create</p>
+            </div>
+          </div>
+        </a>
+      </div>
 
     </div>
   </div>

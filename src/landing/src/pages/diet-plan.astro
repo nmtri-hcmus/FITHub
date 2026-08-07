@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Diet Plan - FITHub">
+  <main class="min-h-screen bg-background pb-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28">
+      <div id="diet-plan-root"></div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import React from 'react';
+  import { createRoot } from 'react-dom/client';
+  import { DietPlanApp } from '../components/sections/DietPlanApp';
+
+  const rootElement = document.getElementById('diet-plan-root');
+  if (rootElement) {
+    const root = createRoot(rootElement);
+    root.render(React.createElement(DietPlanApp));
+  }
+</script>

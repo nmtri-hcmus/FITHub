@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import type { BiometricsResponse } from '../lib/api';
 import { api } from '../lib/api';
+import { AIAssistantModal } from './AIAssistantModal';
 
 const GOAL_DISPLAY: Record<string, string> = {
   LOSE_WEIGHT: '🔥 Cutting — Fat Loss',
@@ -28,6 +29,7 @@ const DashboardGreetingInner: React.FC = () => {
   const [biometrics, setBiometrics] = useState<BiometricsResponse | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -147,15 +149,38 @@ const DashboardGreetingInner: React.FC = () => {
         </div>
       </div>
 
-      {/* Coming Soon Notice */}
-      <div className="border border-dashed border-surface-edge rounded-2xl p-6 text-center">
-        <p className="text-text-subtle text-sm">
-          🚀 <span className="font-semibold text-text-muted">Full dashboard coming soon</span> — meal logging, AI Chef, coach marketplace & more.
-        </p>
-        <a href="/survey" className="text-xs text-primary hover:underline mt-2 inline-block">
-          Update my profile →
-        </a>
-      </div>
+      {/* AI Assistant CTA */}
+      <button
+        onClick={() => setIsAIAssistantOpen(true)}
+        className="relative overflow-hidden bg-surface-alt rounded-[2rem] border border-surface-edge p-6 text-left group hover:border-primary/50 transition-colors shadow-lg"
+      >
+        <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 rounded-full blur-[40px] pointer-events-none group-hover:bg-primary/20 transition-colors" />
+        <div className="relative z-10 flex items-center gap-6">
+          <div className="w-16 h-16 shrink-0 rounded-2xl bg-surface border border-surface-edge flex items-center justify-center text-3xl shadow-inner group-hover:scale-105 transition-transform">
+            ✨
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-white mb-1">AI Recipe Assistant</h3>
+            <p className="text-text-muted text-sm max-w-md">
+              Don't know what to cook? Tell me what's in your fridge, and I'll generate a custom recipe that hits your remaining macros.
+            </p>
+          </div>
+          <div className="ml-auto w-10 h-10 rounded-full bg-primary text-surface flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all">
+            →
+          </div>
+        </div>
+      </button>
+
+      {/* AIAssistant Modal */}
+      <AIAssistantModal
+        isOpen={isAIAssistantOpen}
+        date={new Date().toISOString().split('T')[0]}
+        onClose={() => setIsAIAssistantOpen(false)}
+        onLogged={() => {
+          // In a real app we might toast here or update a context
+          console.log('AI Meal logged!');
+        }}
+      />
     </div>
   );
 };

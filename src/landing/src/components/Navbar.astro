@@ -2,8 +2,9 @@
 import { NavbarAuthCTA } from './NavbarAuthCTA';
 
 const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
+const isLandingPage = Astro.url.pathname.replace(/\/$/, '') === '';
 ---
-<nav id="main-nav" class="fixed top-0 left-0 w-full z-50 nav-adaptive backdrop-blur-md pointer-events-none transition-all duration-300">
+<nav id="main-nav" class={`fixed top-0 left-0 w-full z-50 nav-adaptive backdrop-blur-md pointer-events-none transition-all duration-300 ${!isLandingPage ? 'nav-inner' : ''}`}>
   <div class="relative flex items-center justify-between w-full px-4 sm:px-8 lg:px-12 py-3">
 
     <!-- Left: Logo -->
@@ -14,9 +15,9 @@ const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
     {!isLoginPage && (
       <!-- Center: Morphing Menu Pill -->
       <div class="pointer-events-auto absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
-        <div class="nav-pill group nav-glass rounded-full flex items-center cursor-pointer text-text-muted h-11" tabindex="0">
+        <div class={`nav-pill group nav-glass rounded-full flex items-center cursor-pointer text-text-muted h-11 ${!isLandingPage ? 'nav-pill--expanded' : ''}`} tabindex="0">
 
-          <!-- "Menu" label + hamburger — visible by default, hidden on hover -->
+          <!-- "Menu" label + hamburger — visible by default on landing, hidden on hover -->
           <div class="nav-pill__label flex items-center gap-2.5 px-5 h-full overflow-hidden whitespace-nowrap">
             <span class="font-medium text-sm tracking-widest uppercase">Menu</span>
             <!-- Hamburger / X icon -->
@@ -30,17 +31,14 @@ const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
             </span>
           </div>
 
-          <!-- Nav links — hidden (zero-width) by default, expand on hover -->
+          <!-- Nav links — hidden (zero-width) by default on landing, expand on hover -->
+          <!-- On inner pages (nav-pill--expanded), always visible -->
           <div class="nav-pill__links flex items-center h-full overflow-hidden whitespace-nowrap">
-            <a href="#features" class="px-5 h-full flex items-center text-sm font-medium text-text-soft hover:text-primary transition-colors">Features</a>
-            <span class="text-white/10 select-none">|</span>
-            <a href="#coaches" class="px-5 h-full flex items-center text-sm font-medium text-text-soft hover:text-primary transition-colors">For Coaches</a>
-            <span class="text-white/10 select-none">|</span>
-            <a href="#pricing" class="px-5 h-full flex items-center text-sm font-medium text-text-soft hover:text-primary transition-colors">Pricing</a>
-            <span class="text-white/10 select-none">|</span>
-            <a href="/dashboard" class="px-5 h-full flex items-center text-sm font-medium text-text-soft hover:text-primary transition-colors">Dashboard</a>
-            <span class="text-white/10 select-none">|</span>
-            <a href="/log-food" class="px-5 h-full flex items-center text-sm font-bold text-primary hover:text-primary-light transition-colors">Log Food</a>
+            <a href="/#coaches" class="px-6 h-full flex items-center text-sm font-medium tracking-widest uppercase text-text-muted hover:text-primary transition-colors">Coaches</a>
+            <a href="/dashboard" class="px-6 h-full flex items-center text-sm font-medium tracking-widest uppercase text-text-muted hover:text-primary transition-colors">Dashboard</a>
+            <a href="/log-food" class="px-6 h-full flex items-center text-sm font-medium tracking-widest uppercase text-text-muted hover:text-primary transition-colors">Log Food</a>
+            <a href="/recipes" class="px-6 h-full flex items-center text-sm font-medium tracking-widest uppercase text-text-muted hover:text-primary transition-colors">Recipes</a>
+            <a href="/diet-plan" class="px-6 h-full flex items-center text-sm font-medium tracking-widest uppercase text-text-muted hover:text-primary transition-colors">Diet Plan</a>
           </div>
 
         </div>
@@ -75,9 +73,6 @@ const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
     -webkit-backdrop-filter: blur(24px) saturate(1.8) brightness(1.1);
     transition: background 250ms ease;
   }
-  .nav-glass:hover {
-    background: rgba(20, 25, 32, 0.65);
-  }
 
   /* ── Morphing pill ── */
 
@@ -90,8 +85,20 @@ const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
   }
   .nav-pill:hover .nav-pill__links,
   .nav-pill:focus-within .nav-pill__links {
-    max-width: 480px;   /* large enough for all links */
+    max-width: 900px;   /* large enough for all links */
     opacity: 1;
+  }
+
+  /* On inner pages: always expanded, no interaction needed */
+  .nav-pill--expanded .nav-pill__links {
+    max-width: 900px !important;
+    opacity: 1 !important;
+  }
+  .nav-pill--expanded .nav-pill__label {
+    max-width: 0 !important;
+    opacity: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   /* "Menu" label: visible → collapsed on hover */
@@ -108,12 +115,17 @@ const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
     padding-left: 0;
     padding-right: 0;
   }
+
   /* ── Adaptive background ── */
   nav.nav-adaptive {
     background: rgba(13, 33, 24, 0.75); /* over hero: dark forest */
   }
   nav.nav-adaptive.nav-light {
     background: rgba(255, 255, 255, 0.92); /* over white sections */
+  }
+  /* Inner pages: keep the dark nav always */
+  nav.nav-inner {
+    background: rgba(12, 15, 20, 0.80) !important;
   }
 
   /* ── Logo color swap ── */
@@ -124,13 +136,23 @@ const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
   nav.nav-adaptive.nav-light .nav-logo {
     color: var(--color-primary-dark);
   }
+  nav.nav-inner .nav-logo {
+    color: var(--color-primary) !important;
+  }
+
+  /* ── Active page highlight ── */
+  .nav-pill__links a[aria-current="page"] {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
 </style>
 
 <script>
   const nav = document.getElementById('main-nav');
   const hero = document.querySelector('section');
 
-  if (nav && hero) {
+  // Only run the scroll observer on the landing page (where a hero section exists)
+  if (nav && hero && !nav.classList.contains('nav-inner')) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -143,4 +165,14 @@ const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
     );
     observer.observe(hero);
   }
+
+  // Mark the active page link
+  const links = document.querySelectorAll('.nav-pill__links a');
+  links.forEach(link => {
+    const href = link.getAttribute('href');
+    if (href && window.location.pathname === href) {
+      link.setAttribute('aria-current', 'page');
+    }
+  });
 </script>
+

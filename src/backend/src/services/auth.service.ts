@@ -2,12 +2,13 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
 import { User } from '../generated/prisma/client';
+import crypto from 'crypto'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 const REFRESH_SECRET = process.env.JWT_SECRET ? process.env.JWT_SECRET + '_refresh' : 'fallback_refresh';
 
 export class AuthService {
-  
+
   // 1. REGISTER A NEW USER
   static async register(email: string, passwordRaw: string, name: string) {
     // Check if user exists
@@ -50,8 +51,11 @@ export class AuthService {
   // Helper method to generate both tokens
   private static async generateTokens(user: User) {
     const accessToken = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ id: user.id }, REFRESH_SECRET, { expiresIn: '7d' });
-
+    const refreshToken = jwt.sign(
+      { id: user.id, jti: crypto.randomUUID() },
+      REFRESH_SECRET,
+      { expiresIn: '7d' }
+    );
     // Store refresh token in DB for revocation capability
     await prisma.refreshToken.create({
       data: {

@@ -108,6 +108,30 @@ export const api = {
     delete: (id: string) =>
       request(`/api/meals/${id}`, { method: 'DELETE' }),
   },
+
+  recipes: {
+    create: (data: CreateRecipeInput) =>
+      request<Recipe>('/api/recipes', { method: 'POST', body: JSON.stringify(data) }),
+    getApproved: () => request<Recipe[]>('/api/recipes/approved'),
+    getMine: () => request<Recipe[]>('/api/recipes/mine'),
+    getById: (id: string) => request<Recipe>(`/api/recipes/${id}`),
+    update: (id: string, data: Partial<CreateRecipeInput>) =>
+      request<Recipe>(`/api/recipes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: string) => request(`/api/recipes/${id}`, { method: 'DELETE' }),
+  },
+
+  calendar: {
+    schedule: (data: { recipeId: string; date: string; mealType: MealType }) =>
+      request<DietCalendarEntry>('/api/calendar/entries', { method: 'POST', body: JSON.stringify(data) }),
+    getWeek: (week: string) => request<DietCalendarEntry[]>(`/api/calendar?week=${week}`),
+    deleteEntry: (id: string) => request(`/api/calendar/entries/${id}`, { method: 'DELETE' }),
+    groceryList: (week: string) => request<GroceryItem[]>(`/api/calendar/grocery-list?week=${week}`),
+  },
+
+  ai: {
+    generateRecipe: (data: { availableIngredients: string[]; date: string }) =>
+      request<Recipe>('/api/ai/generate-recipe', { method: 'POST', body: JSON.stringify(data) }),
+  },
 };
 
 // ── Types for API responses ───────────────────────────────────────────────────
@@ -227,4 +251,84 @@ export function mapActivity(a: FrontendActivity): OnboardPayload['activityLevel'
     very_active: 'EXTRA_ACTIVE',
   };
   return map[a];
+}
+
+// ── Recipe types ──────────────────────────────────────────────────────────────
+
+export type RecipeStatus = 'PRIVATE' | 'PENDING' | 'APPROVED';
+
+export interface RecipeIngredient {
+  id: string;
+  recipeId: string;
+  ingredientName: string;
+  quantity: string;
+}
+
+export interface Recipe {
+  id: string;
+  userId: string;
+  recipeName: string;
+  instructions: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  status: RecipeStatus;
+  createdAt: string;
+  updatedAt: string;
+  ingredients: RecipeIngredient[];
+  user?: { id: string; name: string };
+}
+
+export interface CreateRecipeInput {
+  recipeName: string;
+  instructions: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  ingredients: { ingredientName: string; quantity: string }[];
+  status?: 'PRIVATE' | 'PENDING';
+}
+
+// ── Calendar types ────────────────────────────────────────────────────────────
+
+export interface DietCalendarEntry {
+  id: string;
+  userId: string;
+  recipeId: string;
+  date: string;
+  mealType: MealType;
+  createdAt: string;
+  recipe: Recipe;
+}
+
+export interface GroceryItem {
+  ingredientName: string;
+  quantities: string[];
+  totalOccurrences: number;
+}
+
+// ── Calendar helpers ──────────────────────────────────────────────────────────
+
+/** Returns the ISO week string (e.g. "2026-W32") for any given Date */
+export function getISOWeek(date: Date): string {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  const weekNum = 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+  return `${d.getFullYear()}-W${String(weekNum).padStart(2, '0')}`;
+}
+
+/** Returns the Monday Date of a given ISO week string */
+export function getMondayOfWeek(weekStr: string): Date {
+  const [yearStr, wStr] = weekStr.split('-W');
+  const year = parseInt(yearStr);
+  const week = parseInt(wStr);
+  const jan4 = new Date(year, 0, 4);
+  const dow = jan4.getDay() || 7;
+  const monday = new Date(jan4);
+  monday.setDate(jan4.getDate() - dow + 1 + (week - 1) * 7);
+  return monday;
 }
