@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FITHub Chat Tester</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
+    .box { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
+    input, button { margin-top: 0.5rem; padding: 0.5rem; width: 100%; box-sizing: border-box; }
+    #messages { height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 1rem; background: #f9f9f9; }
+    .msg { margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 4px; background: #e3f2fd; }
+  </style>
+</head>
+<body>
+
+  <h2>FITHub Chat Tester</h2>
+  
+  <div class="box">
+    <label>Your JWT Token:</label>
+    <input type="text" id="token" placeholder="eyJhbGciOi...">
+    <button onclick="connect()">1. Connect to Socket</button>
+  </div>
+
+  <div class="box">
+    <label>Other User's ID (Coach or Trainee):</label>
+    <input type="text" id="otherUserId" placeholder="76c7df06-53b6-4dc1-a7e2-32c6320989b1">
+    <button onclick="joinRoom()">2. Join Conversation Room</button>
+  </div>
+
+  <div class="box">
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">3. Send Message</button>
+  </div>
+
+  <script>
+    let socket;
+
+    function connect() {
+      const token = document.getElementById('token').value;
+      if (!token) return alert('Please enter your token');
+      
+      socket = io('http://localhost:3000/chat', {
+        auth: { token: token }
+      });
+
+      socket.on('connect', () => {
+        alert('Connected successfully! Socket ID: ' + socket.id);
+      });
+
+      socket.on('connect_error', (err) => {
+        alert('Connection Failed: ' + err.message);
+      });
+
+      // Listen for incoming messages
+      socket.on('receive-message', (msg) => {
+        const div = document.createElement('div');
+        div.className = 'msg';
+        div.innerHTML = `<strong>${msg.sender?.name || 'Unknown'}:</strong> ${msg.content}`;
+        document.getElementById('messages').appendChild(div);
+      });
+    }
+
+    function joinRoom() {
+      if (!socket) return alert('Connect first!');
+      const otherId = document.getElementById('otherUserId').value;
+      if (!otherId) return alert('Enter the other user ID');
+      
+      socket.emit('join-room', otherId);
+      alert('Joined room with ' + otherId);
+    }
+
+    function sendMessage() {
+      if (!socket) return alert('Connect first!');
+      const receiverId = document.getElementById('otherUserId').value;
+      const content = document.getElementById('messageInput').value;
+      
+      socket.emit('send-message', {
+        receiverId: receiverId,
+        content: content
+      });
+      
+      document.getElementById('messageInput').value = ''; // clear input
+    }
+  </script>
+</body>
+</html>

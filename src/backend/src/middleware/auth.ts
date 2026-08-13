@@ -27,3 +27,11 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
     res.status(401).json({ error: 'Unauthorized: Token expired or invalid' });
   }
 };
+export const requireRole = (roles: string[]) => {
+  return (req: AuthRequest, res: any, next: any) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Forbidden: Insufficient role' });
+    }
+    next();
+  };
+};

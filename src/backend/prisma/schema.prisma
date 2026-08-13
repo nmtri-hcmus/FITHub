@@ -26,6 +26,17 @@ model User {
   refreshTokens   RefreshToken[]
   recipes         Recipe[]
   calendarEntries DietCalendarEntry[]
+
+  // Phase 4 Coach & Chat Relations
+  coachProfile          CoachProfile?
+  reviewsGiven          Review[]       @relation("ReviewsGiven")
+  reviewsReceived       Review[]       @relation("ReviewsReceived")
+  consultationsBooked   Consultation[] @relation("ConsultationsBooked")
+  consultationsReceived Consultation[] @relation("ConsultationsReceived")
+  subscriptionsAsClient Subscription[] @relation("SubscriptionsAsClient")
+  subscriptionsAsCoach  Subscription[] @relation("SubscriptionsAsCoach")
+  messagesSent          Message[]      @relation("MessagesSent")
+  messagesReceived      Message[]      @relation("MessagesReceived")
 }
 
 enum Role {
@@ -163,3 +174,77 @@ model DietCalendarEntry {
 
   @@index([userId, date])
 }
+
+// ==========================================
+// Phase 4: Coach & Chat
+// ==========================================
+
+model CoachProfile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialty    String
+  hourlyRate   Float
+  isVerified   Boolean  @default(false)
+  bio          String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("ReviewsGiven", fields: [userId], references: [id], onDelete: Cascade)
+  coachId   String
+  coach     User     @relation("ReviewsReceived", fields: [coachId], references: [id], onDelete: Cascade)
+  rating    Int
+  text      String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ConsultationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+model Consultation {
+  id          String             @id @default(uuid())
+  userId      String
+  user        User               @relation("ConsultationsBooked", fields: [userId], references: [id], onDelete: Cascade)
+  coachId     String
+  coach       User               @relation("ConsultationsReceived", fields: [coachId], references: [id], onDelete: Cascade)
+  scheduledAt DateTime
+  status      ConsultationStatus @default(PENDING)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model Subscription {
+  id                   String   @id @default(uuid())
+  userId               String
+  user                 User     @relation("SubscriptionsAsClient", fields: [userId], references: [id], onDelete: Cascade)
+  coachId              String
+  coach                User     @relation("SubscriptionsAsCoach", fields: [coachId], references: [id], onDelete: Cascade)
+  stripeSubscriptionId String   @unique
+  status               String   // e.g., 'active', 'canceled'
+  currentPeriodEnd     DateTime
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Message {
+  id              String   @id @default(uuid())
+  conversationKey String   
+  senderId        String
+  sender          User     @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId      String
+  receiver        User     @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+  content         String   @db.Text
+  mediaUrl        String?
+  isRead          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
