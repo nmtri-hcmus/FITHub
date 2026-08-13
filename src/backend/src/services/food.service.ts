@@ -2,6 +2,18 @@ import axios from 'axios';
 import Tesseract from 'tesseract.js';
 import https from 'https';
 import fs from 'fs/promises';
+import { createClient } from 'redis';
+
+const redisClient = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
+redisClient.on('error', (err: any) => console.error('Redis Client Error:', err));
+redisClient.connect().catch(console.error);
+
+// Optional: Map USDA nutrient IDs or names to our macro fields.
+// Energy (kcal), Protein (g), Carbohydrate (g), Total lipid (fat) (g)
+const extractUSDAMacro = (nutrients: any[], nameRegex: RegExp) => {
+  const nutrient = nutrients.find(n => nameRegex.test(n.nutrientName));
+  return nutrient ? nutrient.value : 0;
+};
 
 // Force Node.js to use IPv4 for DNS resolution. 
 // This fixes the 'ENOTFOUND' error when Node tries (and fails) to use IPv6 on certain networks.
@@ -9,9 +21,115 @@ const httpsAgent = new https.Agent({ family: 4 });
 
 export const FoodService = {
   /**
-   * Search for food items using Open Food Facts API
+   * Primary entry point for searching foods (Autocomplete).
+   * 1. Checks Redis cache.
+   * 2. Queries USDA.
+   * 3. Falls back to OFF if USDA is empty.
    */
   async searchFood(query: string) {
+    const cacheKey = `food_search:${query.toLowerCase()}`;
+    try {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (err) {
+      console.warn('Redis cache read error:', err);
+    }
+
+    let results = [];
+    
+    // 1. Query USDA First
+    try {
+      results = await this.searchUSDA(query);
+    } catch (err) {
+      console.error('USDA search failed:', err);
+    }
+
+    // 2. Combine with Open Food Facts if USDA returned too few results
+    const MIN_RESULTS = 10;
+    if (results.length < MIN_RESULTS) {
+      console.log(`USDA returned only ${results.length} results for "${query}". Fetching from OFF to combine.`);
+      try {
+        const offResults = await this.searchOFF(query);
+        
+        // Combine and deduplicate based on normalized brand + name
+        const combined = [...results, ...offResults];
+        const seen = new Set();
+        
+        results = combined.filter((item: any) => {
+          const brandStr = item.brand ? item.brand.toLowerCase().trim() : '';
+          const nameStr = item.name ? item.name.toLowerCase().trim() : '';
+          const uniqueKey = `${brandStr}::${nameStr}`;
+          
+          if (seen.has(uniqueKey)) {
+            return false; // Skip duplicates
+          }
+          seen.add(uniqueKey);
+          return true;
+        });
+      } catch (err) {
+        console.error('OFF search failed during combination:', err);
+      }
+    }
+
+    // 3. Cache the results for 24 hours (86400 seconds)
+    try {
+      await redisClient.setEx(cacheKey, 86400, JSON.stringify(results));
+    } catch (err) {
+      console.warn('Redis cache write error:', err);
+    }
+
+    return results;
+  },
+
+  /**
+   * Search USDA FoodData Central
+   */
+  async searchUSDA(query: string) {
+    if (!process.env.USDA_API_KEY) {
+      console.warn('No USDA_API_KEY provided. Skipping USDA search.');
+      return [];
+    }
+
+    const response = await axios.get('https://api.nal.usda.gov/fdc/v1/foods/search', {
+      params: {
+        api_key: process.env.USDA_API_KEY,
+        query,
+        dataType: 'Foundation,SR Legacy,Branded',
+        pageSize: 50
+      },
+      timeout: 5000,
+      httpsAgent
+    });
+
+    if (!response.data || !response.data.foods) {
+      return [];
+    }
+
+    return response.data.foods
+      .filter((f: any) => {
+        // Basic filtering to ensure we have valid macros
+        const kcal = extractUSDAMacro(f.foodNutrients || [], /Energy/i);
+        return kcal > 0;
+      })
+      .map((f: any) => ({
+        id: `usda-${f.fdcId}`,
+        name: f.description,
+        brand: f.brandOwner || undefined,
+        calories: extractUSDAMacro(f.foodNutrients || [], /Energy/i),
+        protein: extractUSDAMacro(f.foodNutrients || [], /Protein/i),
+        carbs: extractUSDAMacro(f.foodNutrients || [], /Carbohydrate/i),
+        fat: extractUSDAMacro(f.foodNutrients || [], /Total lipid/i),
+        servingSize: f.servingSize ? `${f.servingSize}${f.servingSizeUnit}` : '100g',
+        imageUrl: undefined // USDA doesn't provide standard images
+      }));
+  },
+
+  /**
+   * Search for food items using Open Food Facts API (Fallback)
+   */
+  async searchOFF(query: string) {
     try {
       const response = await axios.get(`https://us.openfoodfacts.org/cgi/search.pl`, {
         params: {
