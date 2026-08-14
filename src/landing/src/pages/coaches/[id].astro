@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CoachProfileApp } from '../../components/sections/CoachProfileApp';
+
+/**
+ * In Astro static mode, dynamic routes need getStaticPaths.
+ * Since coach IDs come from the database (unknown at build time),
+ * we export a fallback empty array and let the React component
+ * read the coachId from window.location at runtime.
+ *
+ * For production, switch to an SSR adapter (e.g. @astrojs/node).
+ */
+export function getStaticPaths() {
+  // Return empty array — this page is a shell; data loads client-side.
+  // In dev mode (astro dev), dynamic params work without this.
+  return [];
+}
+
+const { id } = Astro.params;
+---
+
+<BaseLayout title="Coach Profile - FITHub">
+  <main class="bg-[#13141c] min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-4">
+      <a href="/coaches" class="text-text-muted hover:text-primary transition-colors text-sm font-semibold flex items-center gap-2">
+        ← Back to Marketplace
+      </a>
+    </div>
+    <CoachProfileApp coachId={id} client:load />
+  </main>
+</BaseLayout>

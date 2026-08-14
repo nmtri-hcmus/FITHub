@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { BecomeACoachPageApp } from '../../components/sections/BecomeACoachPageApp';
+---
+
+<BaseLayout title="Become a Coach - FITHub">
+  <main class="bg-[#13141c] min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-4">
+      <a href="/coaches" class="text-text-muted hover:text-primary transition-colors text-sm font-semibold flex items-center gap-2">
+        ← Back to Marketplace
+      </a>
+    </div>
+    <BecomeACoachPageApp client:load />
+  </main>
+</BaseLayout>

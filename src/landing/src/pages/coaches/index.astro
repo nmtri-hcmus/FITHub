@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CoachMarketplaceApp } from '../../components/sections/CoachMarketplaceApp';
+---
+
+<BaseLayout title="Coach Marketplace - FITHub">
+  <main className="bg-[#13141c] min-h-screen">
+    <CoachMarketplaceApp client:load />
+  </main>
+</BaseLayout>

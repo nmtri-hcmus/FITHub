@@ -132,7 +132,130 @@ export const api = {
     generateRecipe: (data: { availableIngredients: string[]; date: string }) =>
       request<Recipe>('/api/ai/generate-recipe', { method: 'POST', body: JSON.stringify(data) }),
   },
+
+
+  coaches: {
+    /**
+     * Search all verified coaches with optional specialty/rate filters.
+     * Maps to GET /api/coaches
+     */
+    search: (filters: { specialty?: string; maxRate?: number }): Promise<BackendCoachProfile[]> => {
+      const params = new URLSearchParams();
+      if (filters.specialty) params.set('specialty', filters.specialty);
+      if (filters.maxRate) params.set('maxRate', String(filters.maxRate));
+      return request<BackendCoachProfile[]>(`/api/coaches?${params.toString()}`);
+    },
+
+    /**
+     * Get coaches recommended based on user goal.
+     * Maps to GET /api/coaches/recommendations?goal=LOSE_WEIGHT
+     */
+    getRecommendations: (goal: string): Promise<BackendCoachProfile[]> =>
+      request<BackendCoachProfile[]>(`/api/coaches/recommendations?goal=${encodeURIComponent(goal)}`),
+
+    /**
+     * Get a single coach's full profile including reviews.
+     * Maps to GET /api/coaches/:id
+     */
+    getProfile: (id: string): Promise<BackendCoachProfile> =>
+      request<BackendCoachProfile>(`/api/coaches/${id}`),
+
+    /**
+     * Submit a review for a coach (requires active subscription).
+     * Maps to POST /api/coaches/:id/reviews
+     */
+    addReview: (coachId: string, rating: number, text: string): Promise<void> =>
+      request(`/api/coaches/${coachId}/reviews`, {
+        method: 'POST',
+        body: JSON.stringify({ rating, text }),
+      }),
+
+    /**
+     * Book a free 15-minute consultation.
+     * Maps to POST /api/coaches/:id/consultations
+     */
+    bookConsultation: (coachId: string, scheduledAt: string): Promise<BackendConsultation> =>
+      request<BackendConsultation>(`/api/coaches/${coachId}/consultations`, {
+        method: 'POST',
+        body: JSON.stringify({ scheduledAt }),
+      }),
+
+    /**
+     * Get the authenticated trainee's own consultation bookings.
+     * Maps to GET /api/coaches/consultations/mine
+     */
+    getMyConsultations: (): Promise<BackendConsultation[]> =>
+      request<BackendConsultation[]>('/api/coaches/consultations/mine'),
+
+    /**
+     * Check if the authenticated user has an active subscription to a coach.
+     * Derived from GET /api/users/me subscriptionsAsClient.
+     */
+    checkSubscription: async (coachId: string): Promise<boolean> => {
+      try {
+        const profile = await request<UserProfile>('/api/users/me');
+        return (
+          Array.isArray(profile.subscriptionsAsClient) &&
+          profile.subscriptionsAsClient.some(
+            (s: { coachId: string; status: string }) =>
+              s.coachId === coachId && s.status === 'active'
+          )
+        );
+      } catch {
+        return false;
+      }
+    },
+
+    /**
+     * Initiate Stripe checkout for subscribing to a coach.
+     * Maps to POST /api/payment/checkout
+     * Returns a Stripe checkout URL to redirect the user to.
+     */
+    subscribe: (coachId: string): Promise<{ url: string }> =>
+      request<{ url: string }>('/api/payment/checkout', {
+        method: 'POST',
+        body: JSON.stringify({ coachId }),
+      }),
+
+    /**
+     * Get the authenticated coach's own profile.
+     * Maps to GET /api/coaches/me
+     */
+    getMyProfile: (): Promise<BackendCoachProfile | null> =>
+      request<BackendCoachProfile | null>('/api/coaches/me'),
+
+    /**
+     * Create or update the authenticated coach's own profile.
+     * Maps to POST /api/coaches/me
+     */
+    upsertMyProfile: (data: {
+      specialty: string;
+      hourlyRate: number;
+      bio?: string;
+    }): Promise<BackendCoachProfile> =>
+      request<BackendCoachProfile>('/api/coaches/me', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+  },
+
+  coaching: {
+    getClients: () => request<ClientProfile[]>('/api/coaches/clients'),
+    getClientLogs: (clientId: string) =>
+      request<{ mealLogs: MealLog[]; progressLogs: ProgressLog[] }>(
+        `/api/coaches/clients/${clientId}/logs`
+      ),
+    assignPlan: (
+      clientId: string,
+      data: { recipeId: string; date: string; mealType: MealType }
+    ) =>
+      request(`/api/coaches/clients/${clientId}/plan`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+  },
 };
+
 
 // ── Types for API responses ───────────────────────────────────────────────────
 
@@ -142,6 +265,7 @@ export interface UserProfile {
   name: string;
   role: string;
   biometrics: BiometricsResponse | null;
+  subscriptionsAsClient?: { coachId: string; status: string; currentPeriodEnd: string }[];
 }
 
 export interface BiometricsResponse {
@@ -332,3 +456,127 @@ export function getMondayOfWeek(weekStr: string): Date {
   monday.setDate(jan4.getDate() - dow + 1 + (week - 1) * 7);
   return monday;
 }
+
+// ── Backend Coach Types (shape returned by the real API) ─────────────────────
+
+export interface BackendCoachReview {
+  id: string;
+  rating: number;
+  text?: string;
+  createdAt: string;
+  user: { name: string };
+}
+
+export interface BackendCoachProfile {
+  id: string;
+  userId: string;
+  specialty: string;
+  hourlyRate: number;
+  bio?: string;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    name: string;
+    email?: string;
+    reviewsReceived?: BackendCoachReview[];
+  };
+}
+
+export type ConsultationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COMPLETED';
+
+export interface BackendConsultation {
+  id: string;
+  userId: string;
+  coachId: string;
+  scheduledAt: string;
+  status: ConsultationStatus;
+  createdAt: string;
+  updatedAt: string;
+  coach?: {
+    id: string;
+    name: string;
+    coachProfile?: { specialty: string; hourlyRate: number };
+  };
+}
+
+// ── Legacy mock types kept for reference (no longer used by live API) ─────────
+
+/** @deprecated Use BackendCoachProfile instead */
+export interface CoachProfile {
+  id: string;
+  name: string;
+  specialization: string;
+  bio: string;
+  price: number;
+  rating: number;
+  certifications: string[];
+  experienceYrs: number;
+  imageUrl: string;
+}
+
+/** @deprecated Reviews are now embedded in BackendCoachProfile.user.reviewsReceived */
+export interface CoachReview {
+  id: string;
+  coachId: string;
+  traineeName: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
+export interface CoachingSubscription {
+  coachId: string;
+  tier: string;
+  pricePaid: number;
+  date: string;
+}
+
+// MOCK_COACHES kept for any legacy imports but no longer used in live UI
+export const MOCK_COACHES: CoachProfile[] = [];
+
+
+// ── 1-on-1 Coaching Portal Types ───────────────────────────────────────────────
+
+export interface ClientProfile {
+  userId: string;
+  name: string;
+  goal: string;
+  biometrics: {
+    height: number;
+    weight: number;
+    targetWeight: number;
+    dailyCalories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+  weightLogs: { date: string; weight: number }[];
+  macroAdherence: { date: string; consumed: number; target: number }[];
+  adherenceScore: number;
+}
+
+export interface CoachingPlan {
+  date: string;
+  workout: string;
+  mealInstructions: string;
+}
+
+export interface CoachingVideoFeedback {
+  id: string;
+  timestamp: number;
+  note: string;
+}
+
+export interface CoachingMessage {
+  id: string;
+  senderId: string;
+  recipientId: string;
+  text: string;
+  videoUrl?: string;
+  videoDuration?: number;
+  createdAt: string;
+  feedbackNotes?: CoachingVideoFeedback[];
+}
+

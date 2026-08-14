@@ -7,7 +7,17 @@ export class UserService {
   static async getProfile(userId: string) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: { biometrics: true } // Joins the biometrics table
+      include: {
+        biometrics: true,
+        subscriptionsAsClient: {
+          where: { status: 'active' },
+          select: {
+            coachId: true,
+            status: true,
+            currentPeriodEnd: true,
+          },
+        },
+      },
     });
     
     if (!user) throw new Error('User not found');
