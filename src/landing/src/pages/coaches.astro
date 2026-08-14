@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+---
+
+<BaseLayout title="Coach Marketplace - FITHub">
+  <main class="min-h-screen bg-gray-50 pb-20">
+    <Navbar />
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28">
+      <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
+            Coach <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-dark to-primary">Marketplace</span>
+          </h1>
+          <p class="text-gray-600 text-lg max-w-2xl">
+            Find and subscribe to expert coaches tailored to your fitness goals and budget.
+          </p>
+        </div>
+      </div>
+
+      <div id="coaches-app-root"></div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import React from 'react';
+  import { createRoot } from 'react-dom/client';
+  import { CoachesApp } from '../components/sections/CoachesApp';
+
+  const rootElement = document.getElementById('coaches-app-root');
+  if (rootElement) {
+    const root = createRoot(rootElement);
+    root.render(React.createElement(CoachesApp));
+  }
+</script>

@@ -424,7 +424,7 @@ export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
         setIsSearching(false);
         setHasSearched(true);
       }
-    }, 200);
+    }, 300);
     return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
   }, [query]);
 

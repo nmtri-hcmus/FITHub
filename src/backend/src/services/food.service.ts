@@ -46,34 +46,21 @@ export const FoodService = {
       console.error('USDA search failed:', err);
     }
 
-    // 2. Combine with Open Food Facts if USDA returned too few results
-    const MIN_RESULTS = 10;
-    if (results.length < MIN_RESULTS) {
-      console.log(`USDA returned only ${results.length} results for "${query}". Fetching from OFF to combine.`);
+    // 2. Fallback: If USDA returns 0 results, fall back to OFF.
+    if (results.length === 0) {
+      console.log(`USDA returned 0 results for "${query}". Fetching from OFF as fallback.`);
       try {
         const offResults = await this.searchOFF(query);
-        
-        // Combine and deduplicate based on normalized brand + name
-        const combined = [...results, ...offResults];
-        const seen = new Set();
-        
-        results = combined.filter((item: any) => {
-          const brandStr = item.brand ? item.brand.toLowerCase().trim() : '';
-          const nameStr = item.name ? item.name.toLowerCase().trim() : '';
-          const uniqueKey = `${brandStr}::${nameStr}`;
-          
-          if (seen.has(uniqueKey)) {
-            return false; // Skip duplicates
-          }
-          seen.add(uniqueKey);
-          return true;
-        });
+        results = offResults;
       } catch (err) {
-        console.error('OFF search failed during combination:', err);
+        console.error('OFF search failed during fallback:', err);
       }
     }
 
-    // 3. Cache the results for 24 hours (86400 seconds)
+    // 3. Re-rank results by relevance to query
+    results = this.rankResults(results, query);
+
+    // 4. Cache the results for 24 hours (86400 seconds)
     try {
       await redisClient.setEx(cacheKey, 86400, JSON.stringify(results));
     } catch (err) {
@@ -81,6 +68,36 @@ export const FoodService = {
     }
 
     return results;
+  },
+
+  /**
+   * Relevance ranking: score each result so the most relevant items appear first.
+   * Priority (highest to lowest):
+   *  1. Exact name match (case-insensitive)
+   *  2. Name starts with the query
+   *  3. Every query word appears in the name
+   *  4. At least one query word appears in the name
+   *  5. Query appears in brand name
+   */
+  rankResults(results: any[], query: string): any[] {
+    const q = query.toLowerCase().trim();
+    const words = q.split(/\s+/).filter(Boolean);
+
+    const score = (item: any): number => {
+      const name = (item.name || '').toLowerCase();
+      const brand = (item.brand || '').toLowerCase();
+
+      if (name === q) return 100;                              // exact match
+      if (name.startsWith(q)) return 90;                      // starts with full query
+      if (words.length > 1 && words.every(w => name.includes(w))) return 80; // all words present
+      if (words.some(w => name.startsWith(w))) return 70;     // name starts with any query word
+      if (words.every(w => name.includes(w) || brand.includes(w))) return 60; // all words somewhere
+      if (words.some(w => name.includes(w))) return 40;       // partial match
+      if (brand.includes(q)) return 20;                       // brand match only
+      return 0;
+    };
+
+    return [...results].sort((a, b) => score(b) - score(a));
   },
 
   /**
@@ -131,15 +148,16 @@ export const FoodService = {
    */
   async searchOFF(query: string) {
     try {
-      const response = await axios.get(`https://us.openfoodfacts.org/cgi/search.pl`, {
+      // Use world.openfoodfacts.org — more stable than regional US endpoint
+      const response = await axios.get(`https://world.openfoodfacts.org/cgi/search.pl`, {
         params: {
           search_terms: query,
           search_simple: 1,
           action: 'process',
           json: 1,
-          page_size: 50   // Fetch more to compensate for quality filtering below
+          page_size: 50
         },
-        timeout: 5000, // 5 seconds timeout
+        timeout: 8000, // Increased to 8 seconds
         httpsAgent
       });
 
@@ -148,12 +166,10 @@ export const FoodService = {
       }
 
       const results = response.data.products
-        // Step 1: Filter out products with no name or incomplete nutritional data
+        // Filter out products with no name or zero calories
         .filter((p: any) => {
           const name = (p.product_name || '').trim();
-          // Must have a real name
           if (!name) return false;
-          // Must have at least some caloric value (ignore condiments, spices, water, etc.)
           const kcal =
             p.nutriments?.['energy-kcal_100g'] ??
             p.nutriments?.['energy-kcal_serving'] ??
@@ -161,7 +177,6 @@ export const FoodService = {
           if (kcal <= 0) return false;
           return true;
         })
-        // Step 2: Map to our clean schema
         .map((p: any) => ({
           id: p.code,
           name: p.product_name.trim(),
@@ -178,22 +193,10 @@ export const FoodService = {
         }));
 
       return results;
-    } catch (error) {
-      console.warn('⚠️ Open Food Facts API failed (likely local DNS issue). Returning fallback mock data.', error);
-      // Fallback mock data so local development and frontend UI work can continue
-      return [
-        {
-          id: 'mock-123',
-          name: query + ' (Mock Data)',
-          brand: 'Test Brand',
-          calories: 95,
-          protein: 0.5,
-          carbs: 25,
-          fat: 0.3,
-          servingSize: '1 medium',
-          imageUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6faa6?w=200'
-        }
-      ];
+    } catch (error: any) {
+      // Log and return empty — never return fake mock data to users
+      console.warn('⚠️ Open Food Facts API failed:', error?.message || error);
+      return [];
     }
   },
 
