@@ -3,34 +3,73 @@ import { NavbarAuthCTA } from './NavbarAuthCTA';
 
 const isLoginPage = Astro.url.pathname.replace(/\/$/, '') === '/login';
 const isLandingPage = Astro.url.pathname.replace(/\/$/, '') === '';
----
-<nav id="main-nav" class={`fixed top-0 left-0 w-full z-50 nav-adaptive backdrop-blur-md pointer-events-none transition-all duration-300 ${!isLandingPage ? 'nav-inner' : ''}`}>
-  <div class="relative flex items-center justify-between w-full px-4 sm:px-8 lg:px-12 py-3">
+const path = Astro.url.pathname;
 
-    <!-- Left: Logo -->
-    <div class="pointer-events-auto flex-shrink-0 flex items-center h-12 z-10">
-      <a href="/" class="nav-logo text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity drop-shadow-md">FITHub</a>
-    </div>
+// Helper to determine active section for highlighting
+const isDashboard = path.startsWith('/dashboard');
+const isNutrition = path.startsWith('/log-food') || path.startsWith('/recipes') || path.startsWith('/diet-plan');
+const isCoaching  = path.startsWith('/coaches') || path.startsWith('/coaching');
+---
+
+<nav id="main-nav" class={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isLandingPage ? 'nav-landing' : 'nav-inner'}`}>
+  <div class="relative flex items-center justify-between w-full px-4 sm:px-8 lg:px-12 h-16">
+
+    <!-- ── LOGO ─────────────────────────────────────────── -->
+    <a href="/" class="nav-logo text-2xl font-black tracking-tighter shrink-0 z-10 font-mono">FITHub</a>
 
     {!isLoginPage && (
-      <!-- Center: Morphing Menu Pill -->
-      <div class="pointer-events-auto absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20">
-        <div class={`nav-pill group nav-glass rounded-full flex items-center cursor-pointer text-text-muted h-11 ${!isLandingPage ? 'nav-pill--expanded' : ''}`} tabindex="0">
+      <>
+        <!-- ── DESKTOP NAV ───────────────────────────────── -->
+        <div class="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
 
-          <!-- "Menu" label + hamburger — visible by default on landing, hidden on hover -->
-          <div class="nav-pill__label flex items-center gap-2.5 px-5 h-full overflow-hidden whitespace-nowrap">
-            <span class="font-medium text-sm tracking-widest uppercase">Menu</span>
-            <!-- Hamburger / X icon -->
-            <span class="relative w-4 h-4 flex-shrink-0">
-              <svg class="w-4 h-4 absolute inset-0 transition-opacity duration-200 group-hover:opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <!-- Dashboard -->
+          <a
+            href="/dashboard"
+            class={`nav-item px-5 py-2 rounded-full text-xs font-black tracking-[0.12em] uppercase transition-all duration-200 ${isDashboard ? 'nav-item--active' : ''}`}
+          >
+            Dashboard
+          </a>
+
+          <!-- Nutrition Dropdown -->
+          <div class="nav-dropdown-wrap relative" data-dropdown="nutrition">
+            <button
+              class={`nav-item nav-item--dropdown px-5 py-2 rounded-full text-xs font-black tracking-[0.12em] uppercase flex items-center gap-2 transition-all duration-200 ${isNutrition ? 'nav-item--active' : ''}`}
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Nutrition
+              <svg class="nav-chevron w-3 h-3 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
               </svg>
-              <svg class="w-4 h-4 absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </span>
+            </button>
+            <div class="nav-dropdown absolute top-full left-1/2 -translate-x-1/2 mt-3 w-52 rounded-2xl overflow-hidden shadow-2xl" role="menu">
+              <div class="nav-dropdown__inner p-1.5 space-y-0.5">
+                <a href="/log-food" class="nav-dropdown__item flex items-center gap-3 px-4 py-3 rounded-xl" role="menuitem">
+                  <span class="nav-dropdown__icon">🍽️</span>
+                  <div>
+                    <p class="font-bold text-xs uppercase tracking-widest text-white">Log Food</p>
+                    <p class="text-[10px] text-text-muted mt-0.5">Track calories & macros</p>
+                  </div>
+                </a>
+                <a href="/recipes" class="nav-dropdown__item flex items-center gap-3 px-4 py-3 rounded-xl" role="menuitem">
+                  <span class="nav-dropdown__icon">🥗</span>
+                  <div>
+                    <p class="font-bold text-xs uppercase tracking-widest text-white">Recipes</p>
+                    <p class="text-[10px] text-text-muted mt-0.5">Community meal library</p>
+                  </div>
+                </a>
+                <a href="/diet-plan" class="nav-dropdown__item flex items-center gap-3 px-4 py-3 rounded-xl" role="menuitem">
+                  <span class="nav-dropdown__icon">📋</span>
+                  <div>
+                    <p class="font-bold text-xs uppercase tracking-widest text-white">Diet Plan</p>
+                    <p class="text-[10px] text-text-muted mt-0.5">AI-generated meal plans</p>
+                  </div>
+                </a>
+              </div>
+            </div>
           </div>
 
+<<<<<<< Updated upstream
           <!-- Nav links — hidden (zero-width) by default on landing, expand on hover -->
           <!-- On inner pages (nav-pill--expanded), always visible -->
           <div class="nav-pill__links flex items-center h-full overflow-hidden whitespace-nowrap">
@@ -39,140 +78,519 @@ const isLandingPage = Astro.url.pathname.replace(/\/$/, '') === '';
             <a href="/log-food" class="px-6 h-full flex items-center text-sm font-medium tracking-widest uppercase text-text-muted hover:text-primary transition-colors">Log Food</a>
             <a href="/recipes" class="px-6 h-full flex items-center text-sm font-medium tracking-widest uppercase text-text-muted hover:text-primary transition-colors">Recipes</a>
             <a href="/diet-plan" class="px-6 h-full flex items-center text-sm font-medium tracking-widest uppercase text-text-muted hover:text-primary transition-colors">Diet Plan</a>
+=======
+          <!-- Coaching Dropdown -->
+          <div class="nav-dropdown-wrap relative" data-dropdown="coaching">
+            <button
+              class={`nav-item nav-item--dropdown px-5 py-2 rounded-full text-xs font-black tracking-[0.12em] uppercase flex items-center gap-2 transition-all duration-200 ${isCoaching ? 'nav-item--active' : ''}`}
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Coaching
+              <svg class="nav-chevron w-3 h-3 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown absolute top-full left-1/2 -translate-x-1/2 mt-3 w-56 rounded-2xl overflow-hidden shadow-2xl" role="menu">
+              <div class="nav-dropdown__inner p-1.5 space-y-0.5">
+                <a href="/coaches" class="nav-dropdown__item flex items-center gap-3 px-4 py-3 rounded-xl" role="menuitem">
+                  <span class="nav-dropdown__icon">🔍</span>
+                  <div>
+                    <p class="font-bold text-xs uppercase tracking-widest text-white">Find Coaches</p>
+                    <p class="text-[10px] text-text-muted mt-0.5">Browse the marketplace</p>
+                  </div>
+                </a>
+                <a href="/coaching" class="nav-dropdown__item flex items-center gap-3 px-4 py-3 rounded-xl" role="menuitem">
+                  <span class="nav-dropdown__icon">🎓</span>
+                  <div>
+                    <p class="font-bold text-xs uppercase tracking-widest text-white">My Coaching</p>
+                    <p class="text-[10px] text-text-muted mt-0.5">1-on-1 training portal</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+>>>>>>> Stashed changes
           </div>
 
+          <!-- Admin link (hidden by default, revealed by JS) -->
+          <a
+            id="nav-admin-link"
+            href="/admin/dashboard"
+            class="nav-item nav-item--admin px-5 py-2 rounded-full text-xs font-black tracking-[0.12em] uppercase hidden"
+          >
+            ⚙ Admin
+          </a>
+
         </div>
-      </div>
-    )}
 
-    {!isLoginPage && (
-      <!-- Right: Socials & CTA -->
-      <div class="pointer-events-auto ml-auto flex items-center space-x-2 z-10">
-        <a href="#" aria-label="Facebook" class="nav-glass rounded-full w-11 h-11 flex items-center justify-center text-text-muted hover:text-white transition-colors">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
-        </a>
-        <a href="#" aria-label="Instagram" class="nav-glass rounded-full w-11 h-11 flex items-center justify-center text-text-muted hover:text-white transition-colors">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-        </a>
-        <a href="#" aria-label="X" class="nav-glass rounded-full w-11 h-11 flex items-center justify-center text-text-muted hover:text-white transition-colors">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
-        </a>
-        <NavbarAuthCTA client:load />
-      </div>
-    )}
+        <!-- ── RIGHT SIDE: Socials + CTA ─────────────────── -->
+        <div class="hidden md:flex items-center gap-2 ml-auto z-10">
+          <a href="#" aria-label="Facebook" class="nav-social-btn">
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+          </a>
+          <a href="#" aria-label="Instagram" class="nav-social-btn">
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a href="#" aria-label="X" class="nav-social-btn">
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+          </a>
+          <NavbarAuthCTA client:load />
+        </div>
 
+        <!-- ── MOBILE HAMBURGER ──────────────────────────── -->
+        <button
+          id="mobile-menu-btn"
+          class="md:hidden ml-auto z-10 flex flex-col gap-1.5 p-2.5 rounded-xl transition-all duration-200 hover:bg-white/5"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <span class="hamburger-line block w-5 h-0.5 rounded-full transition-all duration-300 origin-center"></span>
+          <span class="hamburger-line block w-5 h-0.5 rounded-full transition-all duration-300"></span>
+          <span class="hamburger-line block w-5 h-0.5 rounded-full transition-all duration-300 origin-center"></span>
+        </button>
+      </>
+    )}
   </div>
+
+  <!-- ── MOBILE MENU PANEL ─────────────────────────────── -->
+  {!isLoginPage && (
+    <div id="mobile-menu" class="mobile-menu md:hidden" aria-hidden="true">
+      <div class="px-4 pt-2 pb-6 space-y-1">
+
+        <!-- Dashboard -->
+        <a
+          href="/dashboard"
+          class={`mobile-link flex items-center gap-3 px-4 py-3.5 rounded-2xl ${isDashboard ? 'mobile-link--active' : ''}`}
+        >
+          <span class="text-lg">📊</span>
+          <span class="font-black text-xs tracking-[0.12em] uppercase">Dashboard</span>
+        </a>
+
+        <!-- Nutrition Accordion -->
+        <div class="mobile-accordion" data-accordion="mobile-nutrition">
+          <button class={`mobile-accordion__trigger flex items-center justify-between w-full px-4 py-3.5 rounded-2xl ${isNutrition ? 'mobile-link--active' : ''}`}>
+            <div class="flex items-center gap-3">
+              <span class="text-lg">🥗</span>
+              <span class="font-black text-xs tracking-[0.12em] uppercase">Nutrition</span>
+            </div>
+            <svg class="mobile-chevron w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="mobile-accordion__body">
+            <div class="ml-4 mt-1 border-l-2 border-[#CCFF00]/20 pl-4 space-y-0.5">
+              <a href="/log-food"  class="mobile-sub-link flex items-center gap-2.5 px-3 py-2.5 rounded-xl">
+                <span>🍽️</span><span class="text-xs font-bold tracking-widest uppercase">Log Food</span>
+              </a>
+              <a href="/recipes"   class="mobile-sub-link flex items-center gap-2.5 px-3 py-2.5 rounded-xl">
+                <span>📖</span><span class="text-xs font-bold tracking-widest uppercase">Recipes</span>
+              </a>
+              <a href="/diet-plan" class="mobile-sub-link flex items-center gap-2.5 px-3 py-2.5 rounded-xl">
+                <span>📋</span><span class="text-xs font-bold tracking-widest uppercase">Diet Plan</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coaching Accordion -->
+        <div class="mobile-accordion" data-accordion="mobile-coaching">
+          <button class={`mobile-accordion__trigger flex items-center justify-between w-full px-4 py-3.5 rounded-2xl ${isCoaching ? 'mobile-link--active' : ''}`}>
+            <div class="flex items-center gap-3">
+              <span class="text-lg">🎓</span>
+              <span class="font-black text-xs tracking-[0.12em] uppercase">Coaching</span>
+            </div>
+            <svg class="mobile-chevron w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="mobile-accordion__body">
+            <div class="ml-4 mt-1 border-l-2 border-[#CCFF00]/20 pl-4 space-y-0.5">
+              <a href="/coaches" class="mobile-sub-link flex items-center gap-2.5 px-3 py-2.5 rounded-xl">
+                <span>🔍</span><span class="text-xs font-bold tracking-widest uppercase">Find Coaches</span>
+              </a>
+              <a href="/coaching" class="mobile-sub-link flex items-center gap-2.5 px-3 py-2.5 rounded-xl">
+                <span>💬</span><span class="text-xs font-bold tracking-widest uppercase">My Coaching</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin link (hidden by default) -->
+        <a id="mobile-admin-link" href="/admin/dashboard" class="mobile-link mobile-link--admin items-center gap-3 px-4 py-3.5 rounded-2xl hidden">
+          <span class="text-lg">⚙️</span>
+          <span class="font-black text-xs tracking-[0.12em] uppercase">Admin Panel</span>
+        </a>
+
+        <!-- Mobile social + auth row -->
+        <div class="pt-4 border-t border-white/10 flex items-center justify-between">
+          <div class="flex gap-3">
+            <a href="#" aria-label="Facebook" class="nav-social-btn"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg></a>
+            <a href="#" aria-label="Instagram" class="nav-social-btn"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+          </div>
+          <NavbarAuthCTA client:load />
+        </div>
+
+      </div>
+    </div>
+  )}
 </nav>
 
 <style>
-  /* ── Glassmorphic base — no border, deep blur ── */
-  .nav-glass {
-    background: rgba(12, 15, 20, 0.50);
-    border: none;
-    backdrop-filter: blur(24px) saturate(1.8) brightness(1.1);
-    -webkit-backdrop-filter: blur(24px) saturate(1.8) brightness(1.1);
-    transition: background 250ms ease;
+  /* ────────────────────────────────────────────────────────────
+     DESIGN TOKENS
+  ──────────────────────────────────────────────────────────── */
+  :root {
+    --lime: #CCFF00;
+    --lime-dim: rgba(204, 255, 0, 0.12);
+    --lime-glow: rgba(204, 255, 0, 0.2);
+    --nav-bg-dark: rgba(10, 13, 14, 0.88);
+    --nav-bg-hero: rgba(10, 13, 14, 0.5);
+    --nav-border: rgba(255, 255, 255, 0.06);
+    --card-bg: rgba(18, 20, 26, 0.98);
   }
 
-  /* ── Morphing pill ── */
+  /* ────────────────────────────────────────────────────────────
+     NAV SHELL
+  ──────────────────────────────────────────────────────────── */
+  #main-nav {
+    background: var(--nav-bg-dark);
+    border-bottom: 1px solid var(--nav-border);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  }
+  #main-nav.nav-landing {
+    background: var(--nav-bg-hero);
+    border-bottom-color: transparent;
+  }
+  #main-nav.nav-landing.nav-scrolled {
+    background: var(--nav-bg-dark);
+    border-bottom-color: var(--nav-border);
+  }
 
-  /* Nav links: collapsed (zero max-width) → expanded on hover */
-  .nav-pill__links {
-    max-width: 0;
+  /* ────────────────────────────────────────────────────────────
+     LOGO
+  ──────────────────────────────────────────────────────────── */
+  .nav-logo {
+    color: var(--lime);
+    letter-spacing: -0.04em;
+  }
+
+  /* ────────────────────────────────────────────────────────────
+     DESKTOP: NAV ITEMS
+  ──────────────────────────────────────────────────────────── */
+  .nav-item {
+    color: rgba(255,255,255,0.55);
+    background: transparent;
+    border: 1px solid transparent;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    cursor: pointer;
+  }
+  .nav-item:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+  }
+  .nav-item--active {
+    color: var(--lime) !important;
+    background: var(--lime-dim) !important;
+    border-color: rgba(204,255,0,0.25) !important;
+  }
+  .nav-item--admin {
+    color: #facc15;
+  }
+  .nav-item--admin:hover {
+    color: #fde047;
+    background: rgba(250,204,21,0.08) !important;
+    border-color: rgba(250,204,21,0.2) !important;
+  }
+
+  /* ────────────────────────────────────────────────────────────
+     DESKTOP: DROPDOWN
+  ──────────────────────────────────────────────────────────── */
+  .nav-dropdown {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.08);
     opacity: 0;
-    transition: max-width 600ms cubic-bezier(0.16, 1, 0.3, 1),
-                opacity    500ms ease;
+    pointer-events: none;
+    transform: translateY(-6px) translateX(-50%);
+    transition: opacity 180ms ease, transform 220ms cubic-bezier(0.16,1,0.3,1);
   }
-  .nav-pill:hover .nav-pill__links,
-  .nav-pill:focus-within .nav-pill__links {
-    max-width: 900px;   /* large enough for all links */
+  .nav-dropdown-wrap.is-open .nav-dropdown,
+  .nav-dropdown-wrap:hover .nav-dropdown {
     opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) translateX(-50%);
+  }
+  /* Rotate chevron when open */
+  .nav-dropdown-wrap.is-open .nav-chevron,
+  .nav-dropdown-wrap:hover .nav-chevron {
+    transform: rotate(180deg);
+  }
+  .nav-dropdown-wrap.is-open .nav-item--dropdown,
+  .nav-dropdown-wrap:hover .nav-item--dropdown {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
   }
 
-  /* On inner pages: always expanded, no interaction needed */
-  .nav-pill--expanded .nav-pill__links {
-    max-width: 900px !important;
-    opacity: 1 !important;
+  .nav-dropdown__inner {
+    background: transparent;
   }
-  .nav-pill--expanded .nav-pill__label {
-    max-width: 0 !important;
-    opacity: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+  .nav-dropdown__item {
+    color: rgba(255,255,255,0.65);
+    border-radius: 0.75rem;
+    transition: background 150ms ease, color 150ms ease;
+    text-decoration: none;
+  }
+  .nav-dropdown__item:hover {
+    background: rgba(204,255,0,0.08);
+    color: #fff;
+  }
+  .nav-dropdown__item:hover .nav-dropdown__icon {
+    transform: scale(1.15);
+  }
+  .nav-dropdown__icon {
+    font-size: 1.15rem;
+    display: block;
+    transition: transform 200ms ease;
+    line-height: 1;
   }
 
-  /* "Menu" label: visible → collapsed on hover */
-  .nav-pill__label {
-    max-width: 140px;
-    opacity: 1;
-    transition: max-width 600ms cubic-bezier(0.16, 1, 0.3, 1),
-                opacity    450ms ease;
+  /* Active subpage highlight inside dropdown */
+  .nav-dropdown__item[aria-current="page"] {
+    background: var(--lime-dim);
+    color: var(--lime);
   }
-  .nav-pill:hover .nav-pill__label,
-  .nav-pill:focus-within .nav-pill__label {
-    max-width: 0;
+  .nav-dropdown__item[aria-current="page"] p:first-child {
+    color: var(--lime);
+  }
+
+  /* ────────────────────────────────────────────────────────────
+     SOCIAL BUTTONS
+  ──────────────────────────────────────────────────────────── */
+  .nav-social-btn {
+    color: rgba(255,255,255,0.4);
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 150ms ease, background 150ms ease;
+    background: transparent;
+    border: 1px solid transparent;
+  }
+  .nav-social-btn:hover {
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.08);
+  }
+
+  /* ────────────────────────────────────────────────────────────
+     MOBILE HAMBURGER
+  ──────────────────────────────────────────────────────────── */
+  .hamburger-line {
+    background: rgba(255,255,255,0.7);
+  }
+  #mobile-menu-btn[aria-expanded="true"] .hamburger-line:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  #mobile-menu-btn[aria-expanded="true"] .hamburger-line:nth-child(2) {
     opacity: 0;
-    padding-left: 0;
-    padding-right: 0;
+    transform: scaleX(0);
+  }
+  #mobile-menu-btn[aria-expanded="true"] .hamburger-line:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
   }
 
-  /* ── Adaptive background ── */
-  nav.nav-adaptive {
-    background: rgba(13, 33, 24, 0.75); /* over hero: dark forest */
+  /* ────────────────────────────────────────────────────────────
+     MOBILE MENU PANEL
+  ──────────────────────────────────────────────────────────── */
+  .mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 420ms cubic-bezier(0.16,1,0.3,1);
+    border-top: 1px solid transparent;
+    background: var(--nav-bg-dark);
   }
-  nav.nav-adaptive.nav-light {
-    background: rgba(255, 255, 255, 0.92); /* over white sections */
-  }
-  /* Inner pages: keep the dark nav always */
-  nav.nav-inner {
-    background: rgba(12, 15, 20, 0.80) !important;
-  }
-
-  /* ── Logo color swap ── */
-  nav.nav-adaptive .nav-logo {
-    color: var(--color-primary);
-    transition: color 300ms ease;
-  }
-  nav.nav-adaptive.nav-light .nav-logo {
-    color: var(--color-primary-dark);
-  }
-  nav.nav-inner .nav-logo {
-    color: var(--color-primary) !important;
+  .mobile-menu.is-open {
+    max-height: 600px;
+    border-top-color: var(--nav-border);
   }
 
-  /* ── Active page highlight ── */
-  .nav-pill__links a[aria-current="page"] {
-    color: var(--color-primary);
-    font-weight: 700;
+  .mobile-link {
+    display: flex;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  .mobile-link:hover {
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    border-color: rgba(255,255,255,0.06);
+  }
+  .mobile-link--active {
+    color: var(--lime) !important;
+    background: var(--lime-dim) !important;
+    border-color: rgba(204,255,0,0.2) !important;
+  }
+  .mobile-link--admin {
+    color: #facc15;
+  }
+
+  /* Mobile Accordion trigger */
+  .mobile-accordion__trigger {
+    background: transparent;
+    border: 1px solid transparent;
+    color: rgba(255,255,255,0.6);
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .mobile-accordion__trigger:hover {
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  /* Mobile accordion body collapse/expand */
+  .mobile-accordion__body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 350ms cubic-bezier(0.16,1,0.3,1);
+  }
+  .mobile-accordion.is-open .mobile-accordion__body {
+    max-height: 300px;
+  }
+  .mobile-accordion.is-open .mobile-chevron {
+    transform: rotate(180deg);
+  }
+  .mobile-accordion.is-open .mobile-accordion__trigger {
+    color: #fff;
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  .mobile-sub-link {
+    display: flex;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    transition: color 150ms ease, background 150ms ease;
+    border-radius: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .mobile-sub-link:hover {
+    color: var(--lime);
+    background: var(--lime-dim);
+  }
+  .mobile-sub-link[aria-current="page"] {
+    color: var(--lime);
   }
 </style>
 
 <script>
-  const nav = document.getElementById('main-nav');
-  const hero = document.querySelector('section');
+  // ────────────────────────────────────────────────────────────
+  // ADMIN LINK VISIBILITY
+  // ────────────────────────────────────────────────────────────
+  try {
+    const userStr = localStorage.getItem('fithub_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user.role === 'ADMIN') {
+        document.getElementById('nav-admin-link')?.classList.remove('hidden');
+        document.getElementById('mobile-admin-link')?.classList.remove('hidden');
+        document.getElementById('mobile-admin-link')?.classList.add('flex');
+      }
+    }
+  } catch { /* ignore */ }
 
-  // Only run the scroll observer on the landing page (where a hero section exists)
-  if (nav && hero && !nav.classList.contains('nav-inner')) {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          nav.classList.remove('nav-light');
-        } else {
-          nav.classList.add('nav-light');
-        }
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(hero);
+  // ────────────────────────────────────────────────────────────
+  // SCROLL: add nav-scrolled class on landing page
+  // ────────────────────────────────────────────────────────────
+  const nav = document.getElementById('main-nav');
+  if (nav?.classList.contains('nav-landing')) {
+    const onScroll = () => {
+      if (window.scrollY > 20) {
+        nav.classList.add('nav-scrolled');
+      } else {
+        nav.classList.remove('nav-scrolled');
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 
-  // Mark the active page link
-  const links = document.querySelectorAll('.nav-pill__links a');
-  links.forEach(link => {
+  // ────────────────────────────────────────────────────────────
+  // ACTIVE PAGE HIGHLIGHT
+  // ────────────────────────────────────────────────────────────
+  const currentPath = window.location.pathname;
+  document.querySelectorAll('.nav-dropdown__item, .mobile-sub-link').forEach(link => {
     const href = link.getAttribute('href');
-    if (href && window.location.pathname === href) {
+    if (href && currentPath.startsWith(href) && href !== '/') {
       link.setAttribute('aria-current', 'page');
     }
   });
-</script>
 
+  // ────────────────────────────────────────────────────────────
+  // DESKTOP DROPDOWNS (click to toggle, hover in CSS)
+  // ────────────────────────────────────────────────────────────
+  document.querySelectorAll<HTMLElement>('.nav-dropdown-wrap').forEach(wrap => {
+    const btn = wrap.querySelector<HTMLButtonElement>('button');
+
+    // Click toggles open/close
+    btn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = wrap.classList.contains('is-open');
+      // Close all other dropdowns
+      document.querySelectorAll('.nav-dropdown-wrap.is-open').forEach(w => w.classList.remove('is-open'));
+      if (!isOpen) {
+        wrap.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', () => {
+    document.querySelectorAll<HTMLElement>('.nav-dropdown-wrap.is-open').forEach(w => {
+      w.classList.remove('is-open');
+      w.querySelector('button')?.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Close dropdowns on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll<HTMLElement>('.nav-dropdown-wrap.is-open').forEach(w => {
+        w.classList.remove('is-open');
+        w.querySelector('button')?.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+
+  // ────────────────────────────────────────────────────────────
+  // MOBILE: HAMBURGER TOGGLE
+  // ────────────────────────────────────────────────────────────
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  mobileBtn?.addEventListener('click', () => {
+    const isOpen = mobileMenu?.classList.contains('is-open');
+    mobileMenu?.classList.toggle('is-open', !isOpen);
+    mobileBtn.setAttribute('aria-expanded', String(!isOpen));
+    mobileMenu?.setAttribute('aria-hidden', String(isOpen));
+  });
+
+  // ────────────────────────────────────────────────────────────
+  // MOBILE: ACCORDION TOGGLE
+  // ────────────────────────────────────────────────────────────
+  document.querySelectorAll<HTMLElement>('.mobile-accordion').forEach(accordion => {
+    const trigger = accordion.querySelector<HTMLButtonElement>('.mobile-accordion__trigger');
+    trigger?.addEventListener('click', () => {
+      accordion.classList.toggle('is-open');
+    });
+  });
+</script>

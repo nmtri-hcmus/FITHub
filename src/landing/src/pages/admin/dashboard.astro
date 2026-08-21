@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { AdminDashboardApp } from '../../components/sections/AdminDashboardApp';
+---
+
+<BaseLayout title="Moderator Dashboard | FITHub">
+  <div class="flex-grow bg-[#13141c] pt-24 pb-12">
+    <AdminDashboardApp client:only="react" />
+  </div>
+</BaseLayout>

@@ -4,10 +4,16 @@ import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
-// Uploads (Requires Auth)
+// Send a message (coach or trainee)
+router.post('/', requireAuth, ChatController.sendMessage);
+
+// Get presigned URL for video uploads
 router.get('/upload-url', requireAuth, ChatController.getPresignedUrl);
 
-// Chat History
+// Add video feedback note (coach only)
+router.post('/feedback', requireAuth, ChatController.addVideoFeedback);
+
+// Chat History with a specific user
 router.get('/:otherUserId', requireAuth, ChatController.getHistory);
 router.put('/:senderId/read', requireAuth, ChatController.markAsRead);
 

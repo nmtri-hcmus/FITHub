@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CoachingSuccessApp } from '../../components/sections/CoachingSuccessApp';
+---
+
+<BaseLayout title="Subscription Success | FITHub">
+  <main class="bg-[#13141c] min-h-screen pt-24 pb-12">
+    <CoachingSuccessApp client:only="react" />
+  </main>
+</BaseLayout>

@@ -1,17 +1,18 @@
 import { prisma } from '../lib/prisma';
 
 export const ChatService = {
-  /**
-   * Generates a consistent conversation key based on two user IDs.
-   * By sorting them, A-B and B-A always produce the same key.
-   */
   generateConversationKey(user1: string, user2: string) {
     return [user1, user2].sort().join(':');
   },
 
-  async saveMessage(senderId: string, receiverId: string, content: string, mediaUrl?: string) {
+  async saveMessage(
+    senderId: string,
+    receiverId: string,
+    content: string,
+    mediaUrl?: string,
+    videoDuration?: number
+  ) {
     const conversationKey = this.generateConversationKey(senderId, receiverId);
-    
     return prisma.message.create({
       data: {
         conversationKey,
@@ -19,40 +20,51 @@ export const ChatService = {
         receiverId,
         content,
         mediaUrl,
-        isRead: false
+        videoDuration,
+        isRead: false,
       },
       include: {
-        sender: { select: { id: true, name: true } }
-      }
+        sender: { select: { id: true, name: true } },
+        feedbackNotes: true,
+      },
     });
   },
 
-  async getMessages(user1: string, user2: string, page: number = 1, limit: number = 20) {
+  async getMessages(user1: string, user2: string, page: number = 1, limit: number = 50) {
     const conversationKey = this.generateConversationKey(user1, user2);
     const skip = (page - 1) * limit;
 
-    return prisma.message.findMany({
+    const messages = await prisma.message.findMany({
       where: { conversationKey },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
       skip,
       take: limit,
       include: {
-        sender: { select: { id: true, name: true } }
-      }
+        sender: { select: { id: true, name: true } },
+        feedbackNotes: { orderBy: { timestamp: 'asc' } },
+      },
     });
+    return messages;
   },
 
   async markAsRead(senderId: string, receiverId: string) {
     const conversationKey = this.generateConversationKey(senderId, receiverId);
-    
-    // If current user is receiverId, mark messages sent by senderId as read
     await prisma.message.updateMany({
-      where: { 
-        conversationKey,
-        receiverId: receiverId, // The person who is reading
-        isRead: false
-      },
-      data: { isRead: true }
+      where: { conversationKey, receiverId, isRead: false },
+      data: { isRead: true },
     });
-  }
+  },
+
+  async addVideoFeedback(messageId: string, coachId: string, timestamp: number, note: string) {
+    // Verify the message exists and belongs to this conversation
+    const message = await prisma.message.findUnique({ where: { id: messageId } });
+    if (!message) throw new Error('Message not found');
+    if (message.receiverId !== coachId && message.senderId !== coachId) {
+      throw new Error('Unauthorized: You are not part of this conversation');
+    }
+
+    return prisma.videoFeedback.create({
+      data: { messageId, timestamp, note },
+    });
+  },
 };

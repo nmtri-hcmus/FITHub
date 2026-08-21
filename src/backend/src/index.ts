@@ -20,28 +20,22 @@ import { ChatService } from './services/chat.service';
 const app = express();
 const httpServer = createServer(app);
 
-// Mount payment routes BEFORE express.json() because Stripe webhook requires raw body buffer
-app.use('/api/payment', paymentRoutes);
-
-// Enable JSON body parsing for API requests (increased limit for Base64 image uploads)
-app.use(express.json({ limit: '50mb' }));
-
 // Allowed origins: reads from FRONTEND_URL env var in production, falls back to localhost for local dev
 const allowedOrigins = process.env.FRONTEND_URL
   ? [process.env.FRONTEND_URL, 'http://localhost:4321', 'http://127.0.0.1:4321']
   : ['http://localhost:4321', 'http://127.0.0.1:4321'];
 
 app.use(cors({
-  // Allow file:// origin (null) during local dev for chat-tester.html
-  origin: (origin, callback) => {
-    if (!origin || origin === 'null' || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  // Allow all origins in local dev to prevent any CORS block
+  origin: (origin, callback) => callback(null, true),
   credentials: true,
 }));
+
+// Mount payment routes BEFORE express.json() because Stripe webhook requires raw body buffer
+app.use('/api/payment', paymentRoutes);
+
+// Enable JSON body parsing for API requests (increased limit for Base64 image uploads)
+app.use(express.json({ limit: '50mb' }));
 
 // Initialize Socket.io on top of our HTTP server
 const io = new Server(httpServer, {

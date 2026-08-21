@@ -24,5 +24,19 @@ export const PaymentController = {
       console.error(err.message);
       res.status(400).send(`Webhook Error: ${err.message}`);
     }
+  },
+
+  async confirm(req: Request, res: Response) {
+    try {
+      const { session_id } = req.query;
+      if (!session_id) {
+        res.status(400).json({ error: 'session_id is required' });
+        return;
+      }
+      const result = await PaymentService.confirmCheckoutSession(session_id as string);
+      res.json(result);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   }
 };

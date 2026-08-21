@@ -118,6 +118,15 @@ export const api = {
     update: (id: string, data: Partial<CreateRecipeInput>) =>
       request<Recipe>(`/api/recipes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) => request(`/api/recipes/${id}`, { method: 'DELETE' }),
+
+    /** Admin-only endpoints for UC-23 */
+    getPending: (): Promise<Recipe[]> =>
+      request<Recipe[]>('/api/recipes/pending'),
+    moderate: (id: string, approve: boolean): Promise<Recipe> =>
+      request<Recipe>(`/api/recipes/${id}/moderate`, {
+        method: 'POST',
+        body: JSON.stringify({ approve }),
+      }),
   },
 
   calendar: {
@@ -217,6 +226,14 @@ export const api = {
         body: JSON.stringify({ coachId }),
       }),
 
+<<<<<<< Updated upstream
+=======
+    /** Verify Stripe Checkout session and sync subscription record */
+    confirmPayment: (sessionId: string): Promise<{ success: boolean; sub?: any }> =>
+      request<{ success: boolean; sub?: any }>(`/api/payment/confirm?session_id=${sessionId}`),
+
+
+>>>>>>> Stashed changes
     /**
      * Get the authenticated coach's own profile.
      * Maps to GET /api/coaches/me
@@ -237,6 +254,7 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+<<<<<<< Updated upstream
   },
 
   coaching: {
@@ -252,6 +270,121 @@ export const api = {
       request(`/api/coaches/clients/${clientId}/plan`, {
         method: 'POST',
         body: JSON.stringify(data),
+=======
+
+    /**
+     * Apply to become a coach (UC-21).
+     * Maps to POST /api/coaches/apply
+     */
+    apply: (data: {
+      specialty: string;
+      hourlyRate: number;
+      bio?: string;
+      idDocumentUrl: string;
+      certDocumentUrl: string;
+    }): Promise<any> =>
+      request('/api/coaches/apply', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    /**
+     * Get user's own application status.
+     * Maps to GET /api/coaches/apply/my-status
+     */
+    getMyApplication: (): Promise<BackendCoachApplication | null> =>
+      request<BackendCoachApplication | null>('/api/coaches/apply/my-status'),
+
+    /**
+     * List all pending coach applications (Admin only).
+     * Maps to GET /api/coaches/applications
+     */
+    getApplications: (): Promise<BackendCoachApplication[]> =>
+      request<BackendCoachApplication[]>('/api/coaches/applications'),
+
+    /**
+     * Resolve a pending application (Admin only) (UC-22).
+     * Maps to POST /api/coaches/applications/:id/resolve
+     */
+    resolveApplication: (id: string, approve: boolean): Promise<any> =>
+      request(`/api/coaches/applications/${id}/resolve`, {
+        method: 'POST',
+        body: JSON.stringify({ approve }),
+      }),
+  },
+
+  coaching: {
+    // ── Trainee-side ──────────────────────────────────────────────────────
+    /** Get list of coaches the trainee is actively subscribed to */
+    getMyCoaches: (): Promise<SubscribedCoach[]> =>
+      request<SubscribedCoach[]>('/api/coaches/my-coaches'),
+
+    /** Get all coaching plans assigned to the current trainee */
+    getMyPlans: (): Promise<CoachingPlan[]> =>
+      request<CoachingPlan[]>('/api/coaches/my-plans'),
+
+    /** Mock-subscribe to a coach (no Stripe, for testing) */
+    mockSubscribe: (coachId: string): Promise<any> =>
+      request('/api/coaches/mock-subscribe', {
+        method: 'POST',
+        body: JSON.stringify({ coachId }),
+      }),
+
+    /** Mock add a dummy client for a coach (for testing empty states) */
+    mockAddClient: (): Promise<any> =>
+      request('/api/coaches/mock-add-client', {
+        method: 'POST',
+      }),
+
+    // ── Coach-side ────────────────────────────────────────────────────────
+    /** Get all clients with active subscriptions */
+    getClients: (): Promise<ClientProfile[]> =>
+      request<ClientProfile[]>('/api/coaches/clients'),
+
+    /** Get a client's meal & progress logs */
+    getClientLogs: (clientId: string): Promise<{ mealLogs: MealLog[]; progressLogs: ProgressLog[] }> =>
+      request(`/api/coaches/clients/${clientId}/logs`),
+
+    /** Get all coaching plans for a specific client */
+    getClientPlans: (clientId: string): Promise<CoachingPlan[]> =>
+      request<CoachingPlan[]>(`/api/coaches/clients/${clientId}/plans`),
+
+    /** Assign or overwrite a coaching plan for a client (UC-14) */
+    assignPlan: (clientId: string, date: string, workout: string, mealInstructions: string, append = false): Promise<CoachingPlan> =>
+      request<CoachingPlan>(`/api/coaches/clients/${clientId}/plan`, {
+        method: 'POST',
+        body: JSON.stringify({ date, workout, mealInstructions, append }),
+      }),
+
+    /** Update a client's daily calorie target */
+    updateCalorieTarget: (clientId: string, calories: number): Promise<any> =>
+      request(`/api/coaches/clients/${clientId}/calories`, {
+        method: 'PUT',
+        body: JSON.stringify({ calories }),
+      }),
+
+    // ── Chat (both sides) ─────────────────────────────────────────────────
+    /** Get chat history with another user */
+    getMessages: (otherUserId: string): Promise<CoachingMessage[]> =>
+      request<CoachingMessage[]>(`/api/chat/${otherUserId}`),
+
+    /** Send a text or video message */
+    sendMessage: (receiverId: string, content: string, mediaUrl?: string, videoDuration?: number): Promise<CoachingMessage> =>
+      request<CoachingMessage>('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({ receiverId, content, mediaUrl, videoDuration }),
+      }),
+
+    /** Get presigned upload signature for Cloudinary */
+    getUploadSignature: (): Promise<{ timestamp: number; signature: string; cloudName: string; apiKey: string; folder: string }> =>
+      request('/api/chat/upload-url'),
+
+    /** Coach adds timestamped video feedback note (UC-16) */
+    addVideoFeedback: (messageId: string, timestamp: number, note: string): Promise<any> =>
+      request('/api/chat/feedback', {
+        method: 'POST',
+        body: JSON.stringify({ messageId, timestamp, note }),
+>>>>>>> Stashed changes
       }),
   },
 };
@@ -539,44 +672,92 @@ export const MOCK_COACHES: CoachProfile[] = [];
 
 // ── 1-on-1 Coaching Portal Types ───────────────────────────────────────────────
 
+export interface SubscribedCoach {
+  coachId: string;
+  coachName: string;
+  specialty: string;
+  subscriptionId: string;
+}
+
 export interface ClientProfile {
   userId: string;
   name: string;
+  email: string;
   goal: string;
+  adherenceScore: number;
   biometrics: {
-    height: number;
-    weight: number;
-    targetWeight: number;
     dailyCalories: number;
     protein: number;
     carbs: number;
     fat: number;
-  };
+    goal: string;
+  } | null;
   weightLogs: { date: string; weight: number }[];
-  macroAdherence: { date: string; consumed: number; target: number }[];
-  adherenceScore: number;
 }
 
 export interface CoachingPlan {
+<<<<<<< Updated upstream
   date: string;
   workout: string;
   mealInstructions: string;
+=======
+  id: string;
+  coachId: string;
+  traineeId: string;
+  date: string;
+  workout: string | null;
+  mealInstructions: string | null;
+  createdAt: string;
+  updatedAt: string;
+>>>>>>> Stashed changes
 }
 
 export interface CoachingVideoFeedback {
   id: string;
+<<<<<<< Updated upstream
+=======
+  messageId: string;
+>>>>>>> Stashed changes
   timestamp: number;
   note: string;
+  createdAt: string;
 }
 
 export interface CoachingMessage {
   id: string;
   senderId: string;
+<<<<<<< Updated upstream
   recipientId: string;
   text: string;
   videoUrl?: string;
   videoDuration?: number;
+=======
+  receiverId: string;
+  content: string;
+  mediaUrl?: string | null;
+  videoDuration?: number | null;
+  isRead: boolean;
+>>>>>>> Stashed changes
   createdAt: string;
-  feedbackNotes?: CoachingVideoFeedback[];
+  sender: { id: string; name: string };
+  feedbackNotes: CoachingVideoFeedback[];
+}
+
+export interface BackendCoachApplication {
+  id: string;
+  userId: string;
+  specialty: string;
+  hourlyRate: number;
+  bio: string | null;
+  idDocumentUrl: string;
+  certDocumentUrl: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 

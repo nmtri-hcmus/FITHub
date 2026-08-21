@@ -124,4 +124,38 @@ export const RecipeService = {
 
     return prisma.recipe.delete({ where: { id } });
   },
+
+  /**
+   * Get all recipes in PENDING review status (Admin view).
+   */
+  async getPendingRecipes() {
+    return prisma.recipe.findMany({
+      where: { status: 'PENDING' },
+      include: { ingredients: true, user: { select: { id: true, name: true, email: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+  },
+
+  /**
+   * Approve or decline a pending recipe (UC-23).
+   */
+  async moderateRecipe(id: string, approve: boolean) {
+    const existing = await prisma.recipe.findUnique({ where: { id } });
+    if (!existing) throw new Error('Recipe not found');
+
+    if (approve) {
+      return prisma.recipe.update({
+        where: { id },
+        data: { status: 'APPROVED' },
+        include: { ingredients: true },
+      });
+    } else {
+      // Revert to PRIVATE status so it's hidden from community but owner still has it
+      return prisma.recipe.update({
+        where: { id },
+        data: { status: 'PRIVATE' },
+        include: { ingredients: true },
+      });
+    }
+  },
 };

@@ -4,7 +4,11 @@ import { api, type BackendCoachProfile } from '../lib/api';
 interface BecomeACoachModalProps {
   isOpen: boolean;
   onClose: () => void;
+<<<<<<< Updated upstream
   onSuccess?: (profile: BackendCoachProfile) => void;
+=======
+  onSuccess?: () => void;
+>>>>>>> Stashed changes
 }
 
 export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
@@ -18,6 +22,7 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+<<<<<<< Updated upstream
   const [existingProfile, setExistingProfile] = useState<BackendCoachProfile | null>(null);
   const [loadingExisting, setLoadingExisting] = useState(false);
 
@@ -25,6 +30,32 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     setLoadingExisting(true);
+=======
+
+  // File uploads
+  const [idFile, setIdFile] = useState<File | null>(null);
+  const [certFile, setCertFile] = useState<File | null>(null);
+  const [idUploading, setIdUploading] = useState(false);
+  const [certUploading, setCertUploading] = useState(false);
+  const [idUrl, setIdUrl] = useState('');
+  const [certUrl, setCertUrl] = useState('');
+
+  const [existingProfile, setExistingProfile] = useState<BackendCoachProfile | null>(null);
+  const [loadingExisting, setLoadingExisting] = useState(false);
+  const [isCoach, setIsCoach] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setLoadingExisting(true);
+    const userStr = localStorage.getItem('fithub_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user.role === 'COACH') {
+        setIsCoach(true);
+      }
+    }
+
+>>>>>>> Stashed changes
     api.coaches.getMyProfile()
       .then((profile) => {
         if (profile) {
@@ -34,16 +65,48 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
           setBio(profile.bio ?? '');
         }
       })
+<<<<<<< Updated upstream
       .catch(() => { /* No profile yet, that's fine */ })
       .finally(() => setLoadingExisting(false));
   }, [isOpen]);
 
+=======
+      .catch(() => { /* No profile yet */ })
+      .finally(() => setLoadingExisting(false));
+  }, [isOpen]);
+
+  const handleIdFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIdFile(file);
+      setIdUploading(true);
+      setTimeout(() => {
+        setIdUrl(`https://fithub-private-documents.s3.amazonaws.com/ids/${Date.now()}_${file.name}`);
+        setIdUploading(false);
+      }, 1000);
+    }
+  };
+
+  const handleCertFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCertFile(file);
+      setCertUploading(true);
+      setTimeout(() => {
+        setCertUrl(`https://fithub-private-documents.s3.amazonaws.com/certs/${Date.now()}_${file.name}`);
+        setCertUploading(false);
+      }, 1000);
+    }
+  };
+
+>>>>>>> Stashed changes
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!specialty.trim() || !hourlyRate) return;
     setLoading(true);
     setError(null);
     try {
+<<<<<<< Updated upstream
       const profile = await api.coaches.upsertMyProfile({
         specialty: specialty.trim(),
         hourlyRate: Number(hourlyRate),
@@ -53,6 +116,35 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
       onSuccess?.(profile);
     } catch (err: any) {
       setError(err.message || 'Failed to save profile. Please try again.');
+=======
+      if (isCoach) {
+        // Edit profile route
+        await api.coaches.upsertMyProfile({
+          specialty: specialty.trim(),
+          hourlyRate: Number(hourlyRate),
+          bio: bio.trim() || undefined,
+        });
+      } else {
+        // Apply route
+        if (!idUrl || !certUrl) {
+          throw new Error('Please upload both your ID and certification documents.');
+        }
+        await api.coaches.apply({
+          specialty: specialty.trim(),
+          hourlyRate: Number(hourlyRate),
+          bio: bio.trim() || undefined,
+          idDocumentUrl: idUrl,
+          certDocumentUrl: certUrl,
+        });
+      }
+      setSuccess(true);
+      setTimeout(() => {
+        onSuccess?.();
+        onClose();
+      }, 1500);
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit application. Please try again.');
+>>>>>>> Stashed changes
     } finally {
       setLoading(false);
     }
@@ -62,7 +154,11 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<<<<<<< Updated upstream
       <div className="bg-[#1e1f26] border border-surface-edge rounded-3xl p-6 max-w-lg w-full relative">
+=======
+      <div className="bg-[#1e1f26] border border-surface-edge rounded-3xl p-6 max-w-lg w-full relative max-h-[90vh] overflow-y-auto">
+>>>>>>> Stashed changes
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-text-muted hover:text-white text-xl leading-none"
@@ -71,12 +167,21 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
         </button>
 
         <h3 className="text-2xl font-bold mb-1">
+<<<<<<< Updated upstream
           {existingProfile ? 'Update Your Coach Profile' : 'Become a Coach'}
         </h3>
         <p className="text-text-muted text-sm mb-6">
           {existingProfile
             ? 'Update your coaching details. Changes will be reviewed by our moderation team.'
             : 'Create your coach profile to appear in the FITHub marketplace. Your credentials will be reviewed before going live.'}
+=======
+          {isCoach ? 'Update Your Coach Profile' : 'Apply for Coach Verification'}
+        </h3>
+        <p className="text-text-muted text-sm mb-6">
+          {isCoach
+            ? 'Update your coaching details. Changes will be saved directly.'
+            : 'Submit your credentials for verification to apply for the Coach role (UC-21).'}
+>>>>>>> Stashed changes
         </p>
 
         {loadingExisting ? (
@@ -86,6 +191,7 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
         ) : success ? (
           <div className="text-center py-8 space-y-4">
             <span className="text-5xl">🎉</span>
+<<<<<<< Updated upstream
             <p className="text-white font-bold text-xl">Profile Submitted!</p>
             <p className="text-text-subtle text-sm max-w-sm mx-auto">
               Your coach profile is now pending verification. Our moderation team will review your credentials and approve it shortly.
@@ -96,6 +202,14 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
             >
               Done
             </button>
+=======
+            <p className="text-white font-bold text-xl">Success!</p>
+            <p className="text-text-subtle text-sm max-w-sm mx-auto">
+              {isCoach
+                ? 'Your profile details have been updated successfully.'
+                : 'Your verification documents have been securely uploaded and submitted for review.'}
+            </p>
+>>>>>>> Stashed changes
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -112,9 +226,12 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
                 onChange={(e) => setSpecialty(e.target.value)}
                 className="w-full bg-surface border border-surface-edge rounded-xl px-4 py-3 text-white placeholder-text-disabled focus:border-primary focus:outline-none transition-colors text-sm"
               />
+<<<<<<< Updated upstream
               <p className="text-text-disabled text-xs mt-1">
                 Describe your main area of expertise clearly — this is how trainees will find you.
               </p>
+=======
+>>>>>>> Stashed changes
             </div>
 
             {/* Monthly Rate */}
@@ -129,16 +246,22 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
                   required
                   min="10"
                   max="1000"
+<<<<<<< Updated upstream
                   step="1"
+=======
+>>>>>>> Stashed changes
                   placeholder="150"
                   value={hourlyRate}
                   onChange={(e) => setHourlyRate(e.target.value)}
                   className="w-full bg-surface border border-surface-edge rounded-xl pl-8 pr-4 py-3 text-white placeholder-text-disabled focus:border-primary focus:outline-none transition-colors text-sm"
                 />
               </div>
+<<<<<<< Updated upstream
               <p className="text-text-disabled text-xs mt-1">
                 The price trainees pay per month for your 1-on-1 coaching plan.
               </p>
+=======
+>>>>>>> Stashed changes
             </div>
 
             {/* Bio */}
@@ -147,19 +270,93 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
                 Bio / Description
               </label>
               <textarea
+<<<<<<< Updated upstream
                 rows={4}
                 placeholder="Tell trainees about your background, certifications, training philosophy, and what makes you unique..."
+=======
+                rows={3}
+                placeholder="Tell trainees about your background, certifications, and training philosophy..."
+>>>>>>> Stashed changes
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 className="w-full bg-surface border border-surface-edge rounded-xl px-4 py-3 text-white placeholder-text-disabled focus:border-primary focus:outline-none transition-colors text-sm resize-none"
               />
             </div>
 
+<<<<<<< Updated upstream
             {/* Verification notice */}
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-amber-400 text-xs">
               <p className="font-bold mb-1">📋 Verification Required</p>
               <p>After submitting, a FITHub moderator will review your profile and credentials. You'll appear in the marketplace only after approval. Please ensure your specialty and bio accurately reflect your qualifications.</p>
             </div>
+=======
+            {/* UC-21 Document Upload inputs (Trainees only) */}
+            {!isCoach && (
+              <div className="space-y-4 border-t border-surface-edge/60 pt-4">
+                <p className="text-xs font-bold text-white uppercase tracking-wider">Required Documentation</p>
+
+                {/* ID Document */}
+                <div>
+                  <label className="block text-xs text-text-muted mb-2">
+                    Government-issued ID (Passport, Driving License, CCCD) *
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="file"
+                      required
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      onChange={handleIdFileChange}
+                      className="hidden"
+                      id="id-file-input"
+                    />
+                    <label
+                      htmlFor="id-file-input"
+                      className="cursor-pointer bg-surface border border-surface-edge text-white font-bold px-4 py-2 rounded-xl text-xs hover:border-primary transition-all flex items-center gap-2 whitespace-nowrap"
+                    >
+                      📁 Choose Document
+                    </label>
+                    {idUploading ? (
+                      <span className="text-xs text-primary animate-pulse">Uploading securely...</span>
+                    ) : idFile ? (
+                      <span className="text-xs text-emerald-400 font-bold truncate">✓ {idFile.name} (Uploaded)</span>
+                    ) : (
+                      <span className="text-xs text-text-disabled">No file selected</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Certifications */}
+                <div>
+                  <label className="block text-xs text-text-muted mb-2">
+                    Professional Training Certifications (NASM, ACE, ISSA, etc.) *
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="file"
+                      required
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      onChange={handleCertFileChange}
+                      className="hidden"
+                      id="cert-file-input"
+                    />
+                    <label
+                      htmlFor="cert-file-input"
+                      className="cursor-pointer bg-surface border border-surface-edge text-white font-bold px-4 py-2 rounded-xl text-xs hover:border-primary transition-all flex items-center gap-2 whitespace-nowrap"
+                    >
+                      📁 Choose Certificate
+                    </label>
+                    {certUploading ? (
+                      <span className="text-xs text-primary animate-pulse">Uploading securely...</span>
+                    ) : certFile ? (
+                      <span className="text-xs text-emerald-400 font-bold truncate">✓ {certFile.name} (Uploaded)</span>
+                    ) : (
+                      <span className="text-xs text-text-disabled">No file selected</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+>>>>>>> Stashed changes
 
             {error && (
               <div className="bg-red-950/20 border border-red-500/30 text-red-400 rounded-xl p-3 text-xs">
@@ -169,11 +366,19 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
 
             <button
               type="submit"
+<<<<<<< Updated upstream
               disabled={loading || !specialty.trim() || !hourlyRate}
               className="w-full bg-primary text-surface font-bold py-3.5 rounded-xl hover:bg-primary-light transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {loading && <div className="w-4 h-4 border-2 border-surface border-t-transparent rounded-full animate-spin" />}
               {existingProfile ? 'Update Profile' : 'Submit Coach Profile'}
+=======
+              disabled={loading || idUploading || certUploading || !specialty.trim() || !hourlyRate}
+              className="w-full bg-primary text-surface font-bold py-3.5 rounded-xl hover:bg-primary-light transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {loading && <div className="w-4 h-4 border-2 border-surface border-t-transparent rounded-full animate-spin" />}
+              {isCoach ? 'Update Profile' : 'Submit Verification Request'}
+>>>>>>> Stashed changes
             </button>
           </form>
         )}

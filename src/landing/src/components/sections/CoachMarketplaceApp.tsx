@@ -100,7 +100,11 @@ const CoachCard: React.FC<{ coach: BackendCoachProfile }> = ({ coach }) => {
         </div>
 
         <a
+<<<<<<< Updated upstream
           href={`/coaches/${coach.userId}`}
+=======
+          href={`/coaches/profile?id=${coach.userId}`}
+>>>>>>> Stashed changes
           className="block w-full text-center py-3 mt-4 rounded-xl font-bold text-sm text-white bg-surface border border-surface-edge group-hover:bg-primary group-hover:text-surface group-hover:border-primary transition-all duration-300"
         >
           View Profile &amp; Book

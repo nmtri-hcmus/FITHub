@@ -37,6 +37,9 @@ model User {
   subscriptionsAsCoach  Subscription[] @relation("SubscriptionsAsCoach")
   messagesSent          Message[]      @relation("MessagesSent")
   messagesReceived      Message[]      @relation("MessagesReceived")
+  plansGiven            CoachingPlan[] @relation("PlansGiven")
+  plansReceived         CoachingPlan[] @relation("PlansReceived")
+  coachApplication      CoachApplication?
 }
 
 enum Role {
@@ -176,7 +179,7 @@ model DietCalendarEntry {
 }
 
 // ==========================================
-// Phase 4: Coach & Chat
+// Phase 4: Coach & Chat & Portal
 // ==========================================
 
 model CoachProfile {
@@ -244,7 +247,55 @@ model Message {
   receiver        User     @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
   content         String   @db.Text
   mediaUrl        String?
+  videoDuration   Int?     // For form-check videos
   isRead          Boolean  @default(false)
   createdAt       DateTime @default(now())
+
+  feedbackNotes   VideoFeedback[]
 }
+
+model VideoFeedback {
+  id        String   @id @default(uuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  timestamp Int
+  note      String   @db.Text
+  createdAt DateTime @default(now())
+}
+
+model CoachingPlan {
+  id               String   @id @default(uuid())
+  coachId          String
+  traineeId        String
+  coach            User     @relation("PlansGiven", fields: [coachId], references: [id], onDelete: Cascade)
+  trainee          User     @relation("PlansReceived", fields: [traineeId], references: [id], onDelete: Cascade)
+  date             DateTime
+  workout          String?  @db.Text
+  mealInstructions String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([coachId, traineeId, date])
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model CoachApplication {
+  id              String            @id @default(uuid())
+  userId          String            @unique
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialty       String
+  hourlyRate      Float
+  bio             String?           @db.Text
+  idDocumentUrl   String
+  certDocumentUrl String
+  status          ApplicationStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
 

@@ -19,6 +19,7 @@ export const CoachController = {
 
   async getRecommendations(req: Request, res: Response) {
     try {
+<<<<<<< Updated upstream
       // @ts-ignore
       const userId = req.user?.id;
       const goal = req.query.goal as string;
@@ -29,6 +30,13 @@ export const CoachController = {
         return res.json(coaches);
       }
 
+=======
+      const goal = req.query.goal as string;
+      if (!goal) {
+        const coaches = await CoachService.searchCoaches({});
+        return res.json(coaches);
+      }
+>>>>>>> Stashed changes
       const coaches = await CoachService.getRecommendations(goal);
       res.json(coaches);
     } catch (err: any) {
@@ -49,15 +57,19 @@ export const CoachController = {
 
   async reviewCoach(req: Request, res: Response) {
     try {
-      // @ts-ignore - added by auth middleware
+      // @ts-ignore
       const userId = req.user.id;
       const { rating, text } = req.body;
+<<<<<<< Updated upstream
       const review = await CoachService.createReview(
         userId,
         req.params.id as string,
         rating,
         text
       );
+=======
+      const review = await CoachService.createReview(userId, req.params.id as string, rating, text);
+>>>>>>> Stashed changes
       res.status(201).json(review);
     } catch (err: any) {
       res.status(403).json({ error: err.message });
@@ -71,11 +83,15 @@ export const CoachController = {
       // @ts-ignore
       const userId = req.user.id;
       const { scheduledAt } = req.body;
+<<<<<<< Updated upstream
       const consultation = await CoachService.bookConsultation(
         userId,
         req.params.id as string,
         new Date(scheduledAt)
       );
+=======
+      const consultation = await CoachService.bookConsultation(userId, req.params.id as string, new Date(scheduledAt));
+>>>>>>> Stashed changes
       res.status(201).json(consultation);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -98,11 +114,15 @@ export const CoachController = {
       // @ts-ignore
       const coachId = req.user.id;
       const { accept } = req.body;
+<<<<<<< Updated upstream
       const result = await CoachService.respondToConsultation(
         coachId,
         req.params.id as string,
         accept
       );
+=======
+      const result = await CoachService.respondToConsultation(coachId, req.params.id as string, accept);
+>>>>>>> Stashed changes
       res.json(result);
     } catch (err: any) {
       res.status(403).json({ error: err.message });
@@ -138,7 +158,11 @@ export const CoachController = {
     }
   },
 
+<<<<<<< Updated upstream
   // ── Portal ────────────────────────────────────────────────────────────────────
+=======
+  // ── 5.6 Portal: Coach-side ────────────────────────────────────────────────────
+>>>>>>> Stashed changes
 
   async getClients(req: Request, res: Response) {
     try {
@@ -155,10 +179,14 @@ export const CoachController = {
     try {
       // @ts-ignore
       const coachId = req.user.id;
+<<<<<<< Updated upstream
       const logs = await CoachingService.getClientLogs(
         coachId,
         req.params.clientId as string
       );
+=======
+      const logs = await CoachingService.getClientLogs(coachId, req.params.clientId as string);
+>>>>>>> Stashed changes
       res.json(logs);
     } catch (err: any) {
       res.status(403).json({ error: err.message });
@@ -169,6 +197,7 @@ export const CoachController = {
     try {
       // @ts-ignore
       const coachId = req.user.id;
+<<<<<<< Updated upstream
       const { recipeId, date, mealType } = req.body;
       const entry = await CoachingService.assignPlan(
         coachId,
@@ -177,9 +206,97 @@ export const CoachController = {
         new Date(date),
         mealType
       );
+=======
+      const { date, workout, mealInstructions, append } = req.body;
+      let entry;
+      if (append) {
+        entry = await CoachingService.appendPlan(coachId, req.params.clientId as string, date, workout ?? '', mealInstructions ?? '');
+      } else {
+        entry = await CoachingService.assignPlan(coachId, req.params.clientId as string, date, workout ?? '', mealInstructions ?? '');
+      }
+>>>>>>> Stashed changes
       res.status(201).json(entry);
     } catch (err: any) {
       res.status(403).json({ error: err.message });
     }
   },
+<<<<<<< Updated upstream
+=======
+
+  async getClientPlans(req: Request, res: Response) {
+    try {
+      // @ts-ignore
+      const coachId = req.user.id;
+      const plans = await CoachingService.getPlansForTrainee(req.params.clientId as string, coachId);
+      res.json(plans);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+
+  async updateClientCalories(req: Request, res: Response) {
+    try {
+      // @ts-ignore
+      const coachId = req.user.id;
+      const { calories } = req.body;
+      const result = await CoachingService.updateCalorieTarget(coachId, req.params.clientId as string, Number(calories));
+      res.json(result);
+    } catch (err: any) {
+      res.status(403).json({ error: err.message });
+    }
+  },
+
+  // ── 5.6 Portal: Trainee-side ──────────────────────────────────────────────────
+
+  async getMySubscribedCoaches(req: Request, res: Response) {
+    try {
+      // @ts-ignore
+      const traineeId = req.user.id;
+      const coaches = await CoachingService.getSubscribedCoaches(traineeId);
+      res.json(coaches);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+
+  async getMyPlans(req: Request, res: Response) {
+    try {
+      // @ts-ignore
+      const traineeId = req.user.id;
+      const plans = await CoachingService.getPlansForTrainee(traineeId);
+      res.json(plans);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+
+  // ── Mock Subscription (dev/testing only) ─────────────────────────────────────
+
+  async mockSubscribe(req: Request, res: Response) {
+    try {
+      // @ts-ignore
+      const traineeId = req.user.id;
+      const { coachId } = req.body;
+      if (!coachId) {
+        res.status(400).json({ error: 'coachId is required' });
+        return;
+      }
+      const sub = await CoachingService.createMockSubscription(traineeId, coachId);
+      res.status(201).json(sub);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+
+  async mockAddClient(req: Request, res: Response) {
+    try {
+      // @ts-ignore
+      const coachId = req.user.id;
+      const sub = await CoachingService.createMockClientForCoach(coachId);
+      res.status(201).json(sub);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+>>>>>>> Stashed changes
 };

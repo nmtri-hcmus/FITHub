@@ -87,4 +87,30 @@ export const RecipeController = {
       return res.status(500).json({ error: error.message || 'Failed to delete recipe' });
     }
   },
+
+  async getPending(_req: Request, res: Response) {
+    try {
+      const recipes = await RecipeService.getPendingRecipes();
+      return res.json(recipes);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message || 'Failed to fetch pending recipes' });
+    }
+  },
+
+  async moderate(req: Request, res: Response) {
+    const id = req.params.id as string;
+    const { approve } = req.body;
+
+    if (approve === undefined) {
+      return res.status(400).json({ error: 'approve (boolean) is required in request body' });
+    }
+
+    try {
+      const recipe = await RecipeService.moderateRecipe(id, Boolean(approve));
+      return res.json(recipe);
+    } catch (error: any) {
+      if (error.message === 'Recipe not found') return res.status(404).json({ error: 'Recipe not found' });
+      return res.status(500).json({ error: error.message || 'Failed to moderate recipe' });
+    }
+  },
 };
