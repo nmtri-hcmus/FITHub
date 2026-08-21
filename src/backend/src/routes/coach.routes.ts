@@ -6,28 +6,6 @@ import { prisma } from '../lib/prisma';
 
 const router = Router();
 
-<<<<<<< Updated upstream
-// ── Static routes first (must be before /:id) ────────────────────────────────
-
-// Marketplace: get coaches recommended for a user's goal (public, but benefits from auth)
-router.get('/recommendations', CoachController.getRecommendations);
-
-// Trainee: view their own consultation bookings and statuses
-router.get('/consultations/mine', requireAuth, CoachController.getMyConsultations);
-
-// Coach portal: manage their own profile (COACH role required)
-router.get('/me', requireAuth, requireRole(['COACH']), CoachController.getMyProfile);
-router.post('/me', requireAuth, requireRole(['COACH']), CoachController.upsertMyProfile);
-router.put('/me', requireAuth, requireRole(['COACH']), CoachController.upsertMyProfile);
-
-// Coach portal: manage their consultation responses
-router.put('/consultations/:id/respond', requireAuth, requireRole(['COACH']), CoachController.respondConsultation);
-
-// Coach portal: client management
-router.get('/clients', requireAuth, requireRole(['COACH']), CoachController.getClients);
-router.get('/clients/:clientId/logs', requireAuth, requireRole(['COACH']), CoachController.getClientLogs);
-router.post('/clients/:clientId/plan', requireAuth, requireRole(['COACH']), CoachController.assignPlan);
-=======
 // Middleware that checks the user's LIVE role from the DB (not the JWT which can be stale)
 // Use this instead of requireRole for coach-only routes so role upgrades take effect immediately.
 const requireFreshCoachRole = async (req: any, res: any, next: any) => {
@@ -86,7 +64,6 @@ router.get('/clients/:clientId/logs', requireAuth, requireFreshCoachRole, CoachC
 router.get('/clients/:clientId/plans', requireAuth, requireFreshCoachRole, CoachController.getClientPlans);
 router.post('/clients/:clientId/plan', requireAuth, requireFreshCoachRole, CoachController.assignPlan);
 router.put('/clients/:clientId/calories', requireAuth, requireFreshCoachRole, CoachController.updateClientCalories);
->>>>>>> Stashed changes
 
 // ── Dynamic routes last ───────────────────────────────────────────────────────
 

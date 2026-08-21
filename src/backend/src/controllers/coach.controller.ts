@@ -19,24 +19,11 @@ export const CoachController = {
 
   async getRecommendations(req: Request, res: Response) {
     try {
-<<<<<<< Updated upstream
-      // @ts-ignore
-      const userId = req.user?.id;
-      const goal = req.query.goal as string;
-
-      if (!goal) {
-        // Fallback: just return all verified coaches
-        const coaches = await CoachService.searchCoaches({});
-        return res.json(coaches);
-      }
-
-=======
       const goal = req.query.goal as string;
       if (!goal) {
         const coaches = await CoachService.searchCoaches({});
         return res.json(coaches);
       }
->>>>>>> Stashed changes
       const coaches = await CoachService.getRecommendations(goal);
       res.json(coaches);
     } catch (err: any) {
@@ -60,16 +47,7 @@ export const CoachController = {
       // @ts-ignore
       const userId = req.user.id;
       const { rating, text } = req.body;
-<<<<<<< Updated upstream
-      const review = await CoachService.createReview(
-        userId,
-        req.params.id as string,
-        rating,
-        text
-      );
-=======
       const review = await CoachService.createReview(userId, req.params.id as string, rating, text);
->>>>>>> Stashed changes
       res.status(201).json(review);
     } catch (err: any) {
       res.status(403).json({ error: err.message });
@@ -83,15 +61,7 @@ export const CoachController = {
       // @ts-ignore
       const userId = req.user.id;
       const { scheduledAt } = req.body;
-<<<<<<< Updated upstream
-      const consultation = await CoachService.bookConsultation(
-        userId,
-        req.params.id as string,
-        new Date(scheduledAt)
-      );
-=======
       const consultation = await CoachService.bookConsultation(userId, req.params.id as string, new Date(scheduledAt));
->>>>>>> Stashed changes
       res.status(201).json(consultation);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -114,15 +84,7 @@ export const CoachController = {
       // @ts-ignore
       const coachId = req.user.id;
       const { accept } = req.body;
-<<<<<<< Updated upstream
-      const result = await CoachService.respondToConsultation(
-        coachId,
-        req.params.id as string,
-        accept
-      );
-=======
       const result = await CoachService.respondToConsultation(coachId, req.params.id as string, accept);
->>>>>>> Stashed changes
       res.json(result);
     } catch (err: any) {
       res.status(403).json({ error: err.message });
@@ -158,11 +120,7 @@ export const CoachController = {
     }
   },
 
-<<<<<<< Updated upstream
-  // ── Portal ────────────────────────────────────────────────────────────────────
-=======
   // ── 5.6 Portal: Coach-side ────────────────────────────────────────────────────
->>>>>>> Stashed changes
 
   async getClients(req: Request, res: Response) {
     try {
@@ -179,14 +137,7 @@ export const CoachController = {
     try {
       // @ts-ignore
       const coachId = req.user.id;
-<<<<<<< Updated upstream
-      const logs = await CoachingService.getClientLogs(
-        coachId,
-        req.params.clientId as string
-      );
-=======
       const logs = await CoachingService.getClientLogs(coachId, req.params.clientId as string);
->>>>>>> Stashed changes
       res.json(logs);
     } catch (err: any) {
       res.status(403).json({ error: err.message });
@@ -197,16 +148,6 @@ export const CoachController = {
     try {
       // @ts-ignore
       const coachId = req.user.id;
-<<<<<<< Updated upstream
-      const { recipeId, date, mealType } = req.body;
-      const entry = await CoachingService.assignPlan(
-        coachId,
-        req.params.clientId as string,
-        recipeId,
-        new Date(date),
-        mealType
-      );
-=======
       const { date, workout, mealInstructions, append } = req.body;
       let entry;
       if (append) {
@@ -214,14 +155,11 @@ export const CoachController = {
       } else {
         entry = await CoachingService.assignPlan(coachId, req.params.clientId as string, date, workout ?? '', mealInstructions ?? '');
       }
->>>>>>> Stashed changes
       res.status(201).json(entry);
     } catch (err: any) {
       res.status(403).json({ error: err.message });
     }
   },
-<<<<<<< Updated upstream
-=======
 
   async getClientPlans(req: Request, res: Response) {
     try {
@@ -298,5 +236,4 @@ export const CoachController = {
       res.status(500).json({ error: err.message });
     }
   },
->>>>>>> Stashed changes
 };

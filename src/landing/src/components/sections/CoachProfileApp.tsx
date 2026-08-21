@@ -60,54 +60,10 @@ const StarRating: React.FC<{ value: number; onChange?: (v: number) => void; read
 interface Props { coachId: string | undefined; }
 
 export const CoachProfileApp: React.FC<Props> = ({ coachId }) => {
-<<<<<<< Updated upstream
-=======
-  const resolvedCoachId = coachId || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('id') : undefined) || '';
-
->>>>>>> Stashed changes
-  const [coach, setCoach] = useState<BackendCoachProfile | null>(null);
-  const [reviews, setReviews] = useState<BackendCoachReview[]>([]);
-  const [consultations, setConsultations] = useState<BackendConsultation[]>([]);
-  const [hasSubscribed, setHasSubscribed] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Active tab in the left panel
-  const [activeTab, setActiveTab] = useState<'credentials' | 'reviews' | 'consultations'>('reviews');
-
-  // Review form
-  const [rating, setRating] = useState(5);
-  const [reviewText, setReviewText] = useState('');
-  const [submittingReview, setSubmittingReview] = useState(false);
-  const [reviewError, setReviewError] = useState<string | null>(null);
-  const [reviewSuccess, setReviewSuccess] = useState(false);
-
-  // Consultation booking modal
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [bookingDate, setBookingDate] = useState('');
-  const [bookingTime, setBookingTime] = useState('');
-  const [bookingLoading, setBookingLoading] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [bookingError, setBookingError] = useState<string | null>(null);
-
-  // Stripe subscribe
-  const [subscribeLoading, setSubscribeLoading] = useState(false);
-  const [subscribeError, setSubscribeError] = useState<string | null>(null);
-
-  // ── Load data ──────────────────────────────────────────────────────────────
-
-  const loadData = useCallback(async () => {
-<<<<<<< Updated upstream
-    if (!coachId) return;
-    setLoading(true);
-    try {
-      const profile = await api.coaches.getProfile(coachId);
-=======
     if (!resolvedCoachId) return;
     setLoading(true);
     try {
       const profile = await api.coaches.getProfile(resolvedCoachId);
->>>>>>> Stashed changes
       setCoach(profile);
       setReviews(profile.user?.reviewsReceived ?? []);
 
@@ -115,31 +71,19 @@ export const CoachProfileApp: React.FC<Props> = ({ coachId }) => {
       if (token) {
         setIsLoggedIn(true);
         const [subbed, myConsults] = await Promise.all([
-<<<<<<< Updated upstream
-          api.coaches.checkSubscription(coachId),
-=======
           api.coaches.checkSubscription(resolvedCoachId),
->>>>>>> Stashed changes
           api.coaches.getMyConsultations(),
         ]);
         setHasSubscribed(subbed);
         // Only show consultations for THIS coach
-<<<<<<< Updated upstream
-        setConsultations(myConsults.filter((c) => c.coachId === coachId));
-=======
         setConsultations(myConsults.filter((c) => c.coachId === resolvedCoachId));
->>>>>>> Stashed changes
       }
     } catch (err: any) {
       console.error('Failed to load coach profile:', err);
     } finally {
       setLoading(false);
     }
-<<<<<<< Updated upstream
-  }, [coachId]);
-=======
   }, [resolvedCoachId]);
->>>>>>> Stashed changes
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -147,19 +91,11 @@ export const CoachProfileApp: React.FC<Props> = ({ coachId }) => {
 
   const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
-<<<<<<< Updated upstream
-    if (!reviewText.trim() || !coachId) return;
-    setSubmittingReview(true);
-    setReviewError(null);
-    try {
-      await api.coaches.addReview(coachId, rating, reviewText);
-=======
     if (!reviewText.trim() || !resolvedCoachId) return;
     setSubmittingReview(true);
     setReviewError(null);
     try {
       await api.coaches.addReview(resolvedCoachId, rating, reviewText);
->>>>>>> Stashed changes
       setReviewSuccess(true);
       setReviewText('');
       setRating(5);
@@ -173,20 +109,12 @@ export const CoachProfileApp: React.FC<Props> = ({ coachId }) => {
 
   const handleBookConsultation = async (e: React.FormEvent) => {
     e.preventDefault();
-<<<<<<< Updated upstream
-    if (!bookingDate || !bookingTime || !coachId) return;
-=======
     if (!bookingDate || !bookingTime || !resolvedCoachId) return;
->>>>>>> Stashed changes
     setBookingLoading(true);
     setBookingError(null);
     try {
       const scheduledAt = new Date(`${bookingDate}T${bookingTime}`).toISOString();
-<<<<<<< Updated upstream
-      await api.coaches.bookConsultation(coachId, scheduledAt);
-=======
       await api.coaches.bookConsultation(resolvedCoachId, scheduledAt);
->>>>>>> Stashed changes
       setBookingSuccess(true);
       await loadData(); // Refresh consultations list
     } catch (err: any) {
@@ -197,19 +125,11 @@ export const CoachProfileApp: React.FC<Props> = ({ coachId }) => {
   };
 
   const handleSubscribe = async () => {
-<<<<<<< Updated upstream
-    if (!coachId) return;
-    setSubscribeLoading(true);
-    setSubscribeError(null);
-    try {
-      const { url } = await api.coaches.subscribe(coachId);
-=======
     if (!resolvedCoachId) return;
     setSubscribeLoading(true);
     setSubscribeError(null);
     try {
       const { url } = await api.coaches.subscribe(resolvedCoachId);
->>>>>>> Stashed changes
       if (url) window.location.href = url;
     } catch (err: any) {
       setSubscribeError(err.message || 'Payment failed. Please try again.');

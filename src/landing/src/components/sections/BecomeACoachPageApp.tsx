@@ -1,21 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BecomeACoachModal } from '../BecomeACoachModal';
-<<<<<<< Updated upstream
-
-/**
- * Full-page wrapper for the Become a Coach flow.
- * Handles auth check and role verification before rendering the form.
- */
-export const BecomeACoachPageApp: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [showModal, setShowModal] = useState(true);
-  const [submitted, setSubmitted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-=======
 import { api, type BackendCoachApplication } from '../../lib/api';
 
 export const BecomeACoachPageApp: React.FC = () => {
@@ -28,7 +12,6 @@ export const BecomeACoachPageApp: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const checkStatus = async () => {
->>>>>>> Stashed changes
     const token = localStorage.getItem('fithub_token');
     const userStr = localStorage.getItem('fithub_user');
     if (token && userStr) {
@@ -36,10 +19,6 @@ export const BecomeACoachPageApp: React.FC = () => {
         const user = JSON.parse(userStr);
         setIsLoggedIn(true);
         setUserRole(user.role);
-<<<<<<< Updated upstream
-      } catch { /* ignore */ }
-    }
-=======
 
         // Fetch application status if they are not already a coach
         if (user.role !== 'COACH') {
@@ -56,42 +35,15 @@ export const BecomeACoachPageApp: React.FC = () => {
   useEffect(() => {
     setMounted(true);
     checkStatus();
->>>>>>> Stashed changes
   }, []);
 
   if (!mounted) return null;
 
-<<<<<<< Updated upstream
-=======
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#13141c] text-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
->>>>>>> Stashed changes
-  // Not logged in
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-[#13141c] text-white flex flex-col items-center justify-center gap-6 px-4 py-20">
-        <span className="text-6xl">🏋️</span>
-        <h1 className="text-3xl font-extrabold text-center">Become a FITHub Coach</h1>
-        <p className="text-text-subtle text-center max-w-md">
-<<<<<<< Updated upstream
-          Join our network of certified personal trainers. You need a FITHub account with a Coach role to register.
-        </p>
-        <a
-          href="/login"
-          className="bg-primary text-surface font-bold px-8 py-3.5 rounded-xl hover:bg-primary-light transition-all"
-=======
           Join our network of certified personal trainers. Apply by uploading your certifications for review.
         </p>
         <a
           href="/login"
           className="bg-primary text-surface font-bold px-8 py-3.5 rounded-xl hover:bg-primary-light transition-all text-sm"
->>>>>>> Stashed changes
         >
           Log In to Continue
         </a>
@@ -99,24 +51,6 @@ export const BecomeACoachPageApp: React.FC = () => {
     );
   }
 
-<<<<<<< Updated upstream
-  // Wrong role
-  if (userRole !== 'COACH') {
-    return (
-      <div className="min-h-screen bg-[#13141c] text-white flex flex-col items-center justify-center gap-6 px-4 py-20">
-        <span className="text-6xl">🔒</span>
-        <h1 className="text-3xl font-extrabold text-center">Coach Role Required</h1>
-        <p className="text-text-subtle text-center max-w-md">
-          Your current account is set to <span className="text-white font-bold">{userRole}</span> role. 
-          To create a coach profile, your account must have the COACH role. 
-          Please contact our support team to upgrade your account.
-        </p>
-        <a
-          href="/coaches"
-          className="bg-surface border border-surface-edge text-white font-bold px-8 py-3.5 rounded-xl hover:border-primary transition-all"
-        >
-          Browse Coaches Instead
-=======
   // Already a coach
   if (userRole === 'COACH') {
     return (
@@ -174,32 +108,11 @@ export const BecomeACoachPageApp: React.FC = () => {
           className="bg-surface border border-surface-edge text-white font-bold px-8 py-3.5 rounded-xl hover:border-primary transition-all text-sm"
         >
           Back to Marketplace
->>>>>>> Stashed changes
         </a>
       </div>
     );
   }
 
-<<<<<<< Updated upstream
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-[#13141c] text-white flex flex-col items-center justify-center gap-6 px-4 py-20">
-        <span className="text-6xl">🎉</span>
-        <h1 className="text-3xl font-extrabold text-center">Profile Submitted!</h1>
-        <p className="text-text-subtle text-center max-w-md">
-          Your coach profile is now pending verification by our moderation team. You'll appear in the marketplace once approved.
-        </p>
-        <div className="flex gap-4">
-          <a href="/coaches" className="bg-primary text-surface font-bold px-8 py-3.5 rounded-xl hover:bg-primary-light transition-all">
-            Browse Marketplace
-          </a>
-          <button
-            onClick={() => { setSubmitted(false); setShowModal(true); }}
-            className="bg-surface border border-surface-edge text-white font-bold px-8 py-3.5 rounded-xl hover:border-primary transition-all"
-          >
-            Edit Profile
-          </button>
-=======
   // If application was rejected
   if (application && application.status === 'REJECTED') {
     return (
@@ -225,20 +138,11 @@ export const BecomeACoachPageApp: React.FC = () => {
           >
             Cancel
           </a>
->>>>>>> Stashed changes
         </div>
       </div>
     );
   }
 
-<<<<<<< Updated upstream
-  return (
-    <div className="min-h-screen bg-[#13141c]">
-      <BecomeACoachModal
-        isOpen={showModal}
-        onClose={() => window.location.href = '/coaches'}
-        onSuccess={() => setSubmitted(true)}
-=======
   // Normal Trainee viewing the page — show apply modal
   return (
     <div className="min-h-screen bg-[#13141c] text-white flex flex-col items-center justify-center gap-6 px-4 py-20">
@@ -262,7 +166,6 @@ export const BecomeACoachPageApp: React.FC = () => {
           setSubmitted(true);
           checkStatus();
         }}
->>>>>>> Stashed changes
       />
     </div>
   );

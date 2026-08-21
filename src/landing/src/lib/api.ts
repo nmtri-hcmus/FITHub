@@ -226,51 +226,6 @@ export const api = {
         body: JSON.stringify({ coachId }),
       }),
 
-<<<<<<< Updated upstream
-=======
-    /** Verify Stripe Checkout session and sync subscription record */
-    confirmPayment: (sessionId: string): Promise<{ success: boolean; sub?: any }> =>
-      request<{ success: boolean; sub?: any }>(`/api/payment/confirm?session_id=${sessionId}`),
-
-
->>>>>>> Stashed changes
-    /**
-     * Get the authenticated coach's own profile.
-     * Maps to GET /api/coaches/me
-     */
-    getMyProfile: (): Promise<BackendCoachProfile | null> =>
-      request<BackendCoachProfile | null>('/api/coaches/me'),
-
-    /**
-     * Create or update the authenticated coach's own profile.
-     * Maps to POST /api/coaches/me
-     */
-    upsertMyProfile: (data: {
-      specialty: string;
-      hourlyRate: number;
-      bio?: string;
-    }): Promise<BackendCoachProfile> =>
-      request<BackendCoachProfile>('/api/coaches/me', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
-<<<<<<< Updated upstream
-  },
-
-  coaching: {
-    getClients: () => request<ClientProfile[]>('/api/coaches/clients'),
-    getClientLogs: (clientId: string) =>
-      request<{ mealLogs: MealLog[]; progressLogs: ProgressLog[] }>(
-        `/api/coaches/clients/${clientId}/logs`
-      ),
-    assignPlan: (
-      clientId: string,
-      data: { recipeId: string; date: string; mealType: MealType }
-    ) =>
-      request(`/api/coaches/clients/${clientId}/plan`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-=======
 
     /**
      * Apply to become a coach (UC-21).
@@ -384,7 +339,6 @@ export const api = {
       request('/api/chat/feedback', {
         method: 'POST',
         body: JSON.stringify({ messageId, timestamp, note }),
->>>>>>> Stashed changes
       }),
   },
 };
@@ -696,11 +650,6 @@ export interface ClientProfile {
 }
 
 export interface CoachingPlan {
-<<<<<<< Updated upstream
-  date: string;
-  workout: string;
-  mealInstructions: string;
-=======
   id: string;
   coachId: string;
   traineeId: string;
@@ -709,35 +658,15 @@ export interface CoachingPlan {
   mealInstructions: string | null;
   createdAt: string;
   updatedAt: string;
->>>>>>> Stashed changes
 }
 
 export interface CoachingVideoFeedback {
   id: string;
-<<<<<<< Updated upstream
-=======
-  messageId: string;
->>>>>>> Stashed changes
-  timestamp: number;
-  note: string;
-  createdAt: string;
-}
-
-export interface CoachingMessage {
-  id: string;
-  senderId: string;
-<<<<<<< Updated upstream
-  recipientId: string;
-  text: string;
-  videoUrl?: string;
-  videoDuration?: number;
-=======
   receiverId: string;
   content: string;
   mediaUrl?: string | null;
   videoDuration?: number | null;
   isRead: boolean;
->>>>>>> Stashed changes
   createdAt: string;
   sender: { id: string; name: string };
   feedbackNotes: CoachingVideoFeedback[];
