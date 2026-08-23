@@ -40,6 +40,12 @@ model User {
   plansGiven            CoachingPlan[] @relation("PlansGiven")
   plansReceived         CoachingPlan[] @relation("PlansReceived")
   coachApplication      CoachApplication?
+
+  // Phase 5 Community
+  subCommunityMemberships SubCommunityMember[]
+  posts                   Post[]
+  comments                Comment[]
+  challengeParticipations ChallengeParticipant[]
 }
 
 enum Role {
@@ -298,4 +304,99 @@ model CoachApplication {
   updatedAt       DateTime          @updatedAt
 }
 
+// ==========================================
+// Phase 5: Community & Social Engagement
+// ==========================================
 
+enum SubCommunityStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model SubCommunity {
+  id          String             @id @default(uuid())
+  name        String             @unique
+  description String?            @db.Text
+  createdById String
+  status      SubCommunityStatus @default(PENDING)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  members     SubCommunityMember[]
+  posts       Post[]
+}
+
+enum SubCommunityRole {
+  MEMBER
+  ADMIN
+}
+
+model SubCommunityMember {
+  id             String           @id @default(uuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subCommunityId String
+  subCommunity   SubCommunity     @relation(fields: [subCommunityId], references: [id], onDelete: Cascade)
+  role           SubCommunityRole @default(MEMBER)
+  joinedAt       DateTime         @default(now())
+
+  @@unique([userId, subCommunityId])
+}
+
+model Post {
+  id             String       @id @default(uuid())
+  title          String
+  content        String       @db.Text
+  authorId       String
+  user           User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  subCommunityId String?
+  subCommunity   SubCommunity? @relation(fields: [subCommunityId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  comments       Comment[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  authorId  String
+  user      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Challenge {
+  id          String                 @id @default(uuid())
+  title       String
+  description String                 @db.Text
+  startDate   DateTime
+  endDate     DateTime
+  criteria    Json                   
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  participants ChallengeParticipant[]
+}
+
+enum ChallengeStatus {
+  ACTIVE
+  COMPLETED
+  FAILED
+}
+
+model ChallengeParticipant {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId String
+  challenge   Challenge       @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  progress    Float           @default(0)
+  status      ChallengeStatus @default(ACTIVE)
+  joinedAt    DateTime        @default(now())
+
+  @@unique([userId, challengeId])
+}
