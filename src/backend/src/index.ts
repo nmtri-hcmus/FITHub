@@ -14,8 +14,11 @@ import aiRoutes from './routes/ai.routes';
 import coachRoutes from './routes/coach.routes';
 import paymentRoutes from './routes/payment.routes';
 import chatRoutes from './routes/chat.routes';
+import communityRoutes from './routes/community.routes';
 import jwt from 'jsonwebtoken';
+import cron from 'node-cron';
 import { ChatService } from './services/chat.service';
+import { LeaderboardService } from './services/leaderboard.service';
 
 const app = express();
 const httpServer = createServer(app);
@@ -57,6 +60,7 @@ app.use('/api/calendar', calendarRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/coaches', coachRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/community', communityRoutes);
 
 // A basic health-check endpoint to verify the API is running
 app.get('/api/health', (req, res) => {
@@ -125,4 +129,12 @@ const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  
+  // Initialize Leaderboard Cron (runs every midnight)
+  cron.schedule('0 0 * * *', () => {
+    LeaderboardService.calculateAndCacheLeaderboard();
+  });
+  
+  // Run once on startup for dev purposes
+  LeaderboardService.calculateAndCacheLeaderboard();
 });
