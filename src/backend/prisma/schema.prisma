@@ -17,6 +17,7 @@ model User {
   password  String
   name      String
   role      Role     @default(USER)
+  isBanned  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -46,6 +47,11 @@ model User {
   posts                   Post[]
   comments                Comment[]
   challengeParticipations ChallengeParticipant[]
+
+  // Phase 6 Admin
+  reportsMade             Report[]       @relation("ReportsMade")
+  reportsReceived         Report[]       @relation("ReportsReceived")
+  adminActions            AdminAction[]  @relation("AdminActions")
 }
 
 enum Role {
@@ -399,4 +405,35 @@ model ChallengeParticipant {
   joinedAt    DateTime        @default(now())
 
   @@unique([userId, challengeId])
+}
+
+// ==========================================
+// Phase 6: Admin Moderation
+// ==========================================
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+}
+
+model Report {
+  id             String       @id @default(uuid())
+  reporterId     String
+  reporter       User         @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUserId String
+  reportedUser   User         @relation("ReportsReceived", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  reason         String       @db.Text
+  status         ReportStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model AdminAction {
+  id         String   @id @default(uuid())
+  adminId    String
+  admin      User     @relation("AdminActions", fields: [adminId], references: [id], onDelete: Cascade)
+  actionType String   // e.g., "BAN_USER", "VERIFY_COACH", "APPROVE_RECIPE"
+  targetId   String   // The ID of the user, coach app, recipe, etc.
+  details    String?  @db.Text
+  createdAt  DateTime @default(now())
 }

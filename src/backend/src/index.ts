@@ -15,6 +15,7 @@ import coachRoutes from './routes/coach.routes';
 import paymentRoutes from './routes/payment.routes';
 import chatRoutes from './routes/chat.routes';
 import communityRoutes from './routes/community.routes';
+import adminRoutes from './routes/admin.routes';
 import jwt from 'jsonwebtoken';
 import cron from 'node-cron';
 import { ChatService } from './services/chat.service';
@@ -61,6 +62,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/coaches', coachRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/community', communityRoutes);
+app.use('/api/admin', adminRoutes);
 
 // A basic health-check endpoint to verify the API is running
 app.get('/api/health', (req, res) => {
