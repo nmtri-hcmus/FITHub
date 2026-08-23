@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
+import { prisma } from '../lib/prisma';
 
 export class AuthController {
   
@@ -18,7 +19,7 @@ export class AuthController {
     }
   }
 
-  static async login(req: Request, res: Response) {
+  static async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
       if (!email || !password) {
@@ -26,6 +27,18 @@ export class AuthController {
         return;
       }
       
+      const user = await prisma.user.findUnique({ where: { email } });
+
+      if (!user) {
+        res.status(401).json({ error: 'Invalid email or password' });
+        return;
+      }
+
+      if (user.isBanned) {
+        res.status(403).json({ error: 'Your account has been banned by an administrator.' });
+        return;
+      }
+
       const result = await AuthService.login(email, password);
       res.status(200).json(result);
     } catch (error: any) {

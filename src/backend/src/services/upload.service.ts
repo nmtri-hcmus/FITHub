@@ -28,5 +28,16 @@ export const UploadService = {
       apiKey: process.env.CLOUDINARY_API_KEY,
       folder
     };
+  },
+
+  async deleteFile(publicId: string) {
+    try {
+      const result = await cloudinary.uploader.destroy(publicId);
+      console.log(`[UploadService] Deleted file ${publicId} from Cloudinary:`, result);
+      return result;
+    } catch (error) {
+      console.error(`[UploadService] Failed to delete file ${publicId}:`, error);
+      throw error;
+    }
   }
 };
