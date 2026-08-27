@@ -249,7 +249,7 @@ export const FoodService = {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
 
     const prompt = `You are a nutrition label parser. Analyze the provided food nutrition label image.
 Extract the following information per serving:
