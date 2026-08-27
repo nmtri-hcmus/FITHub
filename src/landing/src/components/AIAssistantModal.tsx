@@ -40,6 +40,16 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
   const [isLogging, setIsLogging] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [recipeImage, setRecipeImage] = useState<string | null>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setRecipeImage(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Fetch the user's dashboard to check remaining macros (UC-07 A4)
   const fetchDashboard = useCallback(async () => {
@@ -62,6 +72,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
       setError(null);
       setQuantity(1);
       setSaveSuccess(false);
+      setRecipeImage(null);
     }
   }, [isOpen, fetchDashboard]);
 
@@ -117,8 +128,12 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
     }
   };
 
-  const handleSaveRecipe = async () => {
+  const handleSaveRecipe = async (status: 'PRIVATE' | 'PENDING' = 'PRIVATE') => {
     if (!generatedRecipe) return;
+    if (status === 'PENDING' && !recipeImage) {
+      setError('An image is required to share this recipe with the community.');
+      return;
+    }
     setIsSaving(true);
     setError(null);
     try {
@@ -130,10 +145,16 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         carbs: generatedRecipe.macros.carbs,
         fat: generatedRecipe.macros.fat,
         ingredients: generatedRecipe.ingredients,
-        status: 'PRIVATE'
+        status
       });
+      if (recipeImage) {
+        localStorage.setItem(`fithub_recipe_image_${saved.id}`, recipeImage);
+      }
       console.log('[AIAssistantModal] Recipe saved successfully:', saved);
       setSaveSuccess(true);
+      if (status === 'PENDING') {
+        alert('Recipe shared to the community successfully!');
+      }
     } catch (err: any) {
       console.error('[AIAssistantModal] Save recipe failed:', err);
       setError(err.message || 'Failed to save the recipe. Please try again.');
@@ -357,39 +378,53 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     </div>
                   )}
 
-                   <div className="flex flex-col gap-2 mt-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={handleLogMeal}
-                        disabled={isLogging || isSaving}
-                        className="bg-primary text-surface font-bold py-3.5 rounded-xl hover:bg-primary-light transition-all flex items-center justify-center gap-2"
-                      >
-                        {isLogging ? (
-                          <div className="w-4 h-4 border-2 border-surface border-t-transparent rounded-full animate-spin" />
-                        ) : 'Log Meal'}
-                      </button>
+                  <div className="flex flex-col gap-2 mt-2">
+                      <div className="mb-2">
+                        <label className="block text-xs font-semibold text-text-muted mb-1.5">Attach Image (Required for community sharing)</label>
+                        <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-xs text-white file:bg-surface file:border-surface-edge file:border file:text-white file:px-3 file:py-1.5 file:rounded-xl file:cursor-pointer file:font-bold file:mr-3 hover:file:bg-surface-alt transition-colors" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={handleLogMeal}
+                          disabled={isLogging || isSaving}
+                          className="bg-primary text-surface font-bold py-3.5 rounded-xl hover:bg-primary-light transition-all flex items-center justify-center gap-2"
+                        >
+                          {isLogging ? (
+                            <div className="w-4 h-4 border-2 border-surface border-t-transparent rounded-full animate-spin" />
+                          ) : 'Log Meal'}
+                        </button>
+
+                        <button
+                          onClick={() => handleSaveRecipe('PRIVATE')}
+                          disabled={isLogging || isSaving || saveSuccess}
+                          className={`font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 border text-sm ${
+                            saveSuccess
+                              ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-400'
+                              : 'bg-surface border-surface-edge text-white hover:bg-surface-alt'
+                          }`}
+                        >
+                          {isSaving ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : saveSuccess ? (
+                            'Saved ✓'
+                          ) : (
+                            'Save to Library'
+                          )}
+                        </button>
+                      </div>
 
                       <button
-                        onClick={handleSaveRecipe}
+                        onClick={() => handleSaveRecipe('PENDING')}
                         disabled={isLogging || isSaving || saveSuccess}
-                        className={`font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 border text-sm ${
-                          saveSuccess
-                            ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-400'
-                            : 'bg-surface border-surface-edge text-white hover:bg-surface-alt'
-                        }`}
+                        className="w-full bg-emerald-600 border border-emerald-500 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-700 transition-all text-sm flex items-center justify-center gap-2 mt-1"
                       >
                         {isSaving ? (
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : saveSuccess ? (
-                          'Saved ✓'
-                        ) : (
-                          'Save to Recipes'
-                        )}
+                        ) : 'Share to Community 🏆'}
                       </button>
-                    </div>
 
                     <button
-                      onClick={() => { setGeneratedRecipe(null); setError(null); setSaveSuccess(false); }}
+                      onClick={() => { setGeneratedRecipe(null); setError(null); setSaveSuccess(false); setRecipeImage(null); }}
                       disabled={isLogging || isSaving}
                       className="w-full bg-surface border border-surface-edge text-text-muted hover:text-white font-bold py-3.5 rounded-xl hover:bg-surface-alt transition-all text-xs"
                     >

@@ -93,6 +93,42 @@ export const AdminController = {
     }
   },
 
+  async getPendingPosts(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const posts = await AdminService.getPendingPosts();
+      res.json(posts);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  async approvePost(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const { decision } = req.body;
+      const result = await AdminService.approvePost(req.user!.id, String(req.params.id), decision);
+      res.json(result);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  async createChallenge(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const { title, description, startDate, endDate, criteria } = req.body;
+      const challenge = await AdminService.createChallenge(
+        req.user!.id,
+        title,
+        description,
+        startDate,
+        endDate,
+        criteria
+      );
+      res.status(201).json(challenge);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
   // Public endpoint for normal users to report someone
   async createReport(req: AuthRequest, res: Response): Promise<void> {
     try {

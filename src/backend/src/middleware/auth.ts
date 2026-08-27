@@ -32,13 +32,25 @@ export const requireAuth = async (req: AuthRequest, res: Response, next: NextFun
       return;
     }
 
-    // Attach the decoded user data to the request object so the next route can use it
     req.user = decoded;
-    
-    next(); // Pass control to the next route handler
+    next();
   } catch (error) {
     res.status(401).json({ error: 'Unauthorized: Token expired or invalid' });
   }
+};
+
+// Like requireAuth but does NOT reject unauthenticated requests — used for public
+// endpoints that return personalised data when a token is present.
+export const optionalAuth = async (req: AuthRequest, _res: Response, next: NextFunction): Promise<void> => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string; role: string };
+      req.user = decoded;
+    } catch { /* invalid token — treat as guest */ }
+  }
+  next();
 };
 export const requireRole = (roles: string[]) => {
   return (req: AuthRequest, res: any, next: any) => {

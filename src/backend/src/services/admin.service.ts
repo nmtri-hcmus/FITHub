@@ -165,5 +165,47 @@ export const AdminService = {
     });
 
     return { message: 'User banned successfully' };
+  },
+
+  async getPendingPosts() {
+    return prisma.post.findMany({
+      where: { status: 'PENDING' },
+      include: {
+        user: { select: { name: true } },
+        subCommunity: { select: { name: true } }
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+  },
+
+  async approvePost(adminId: string, postId: string, decision: 'APPROVED' | 'REJECTED') {
+    await prisma.post.update({
+      where: { id: postId },
+      data: { status: decision }
+    });
+
+    await prisma.adminAction.create({
+      data: { adminId, actionType: 'APPROVE_POST', targetId: postId, details: `Decision: ${decision}` }
+    });
+
+    return { message: `Post ${decision}` };
+  },
+
+  async createChallenge(adminId: string, title: string, description: string, startDate: string, endDate: string, criteria: any) {
+    const challenge = await prisma.challenge.create({
+      data: {
+        title,
+        description,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        criteria: criteria || {}
+      }
+    });
+
+    await prisma.adminAction.create({
+      data: { adminId, actionType: 'CREATE_CHALLENGE', targetId: challenge.id, details: `Title: ${title}` }
+    });
+
+    return challenge;
   }
 };

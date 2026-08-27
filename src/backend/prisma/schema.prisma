@@ -358,6 +358,7 @@ model Post {
   user           User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   subCommunityId String?
   subCommunity   SubCommunity? @relation(fields: [subCommunityId], references: [id], onDelete: Cascade)
+  status         PostStatus   @default(APPROVED)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -436,4 +437,11 @@ model AdminAction {
   targetId   String   // The ID of the user, coach app, recipe, etc.
   details    String?  @db.Text
   createdAt  DateTime @default(now())
+}
+
+
+enum PostStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

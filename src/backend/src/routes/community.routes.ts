@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { CommunityController } from '../controllers/community.controller';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, optionalAuth } from '../middleware/auth';
 
 const router = Router();
 
 // Posts
 router.post('/posts', requireAuth, CommunityController.createPost);
-router.get('/posts', CommunityController.getPosts); // Public or Auth? Make it public
+router.get('/posts', optionalAuth, CommunityController.getPosts); // Personalised when logged in
 router.get('/posts/:id', CommunityController.getPostDetails);
 router.post('/posts/:id/comments', requireAuth, CommunityController.createComment);
 
@@ -17,7 +17,8 @@ router.post('/groups/:id/join', requireAuth, CommunityController.joinSubCommunit
 
 // Gamification
 router.get('/leaderboards', CommunityController.getLeaderboards);
-router.get('/challenges', CommunityController.getChallenges);
+router.get('/challenges', optionalAuth, CommunityController.getChallenges);
+router.post('/challenges/sync', requireAuth, CommunityController.syncChallengeProgress);
 router.post('/challenges/:id/join', requireAuth, CommunityController.joinChallenge);
 
 export default router;

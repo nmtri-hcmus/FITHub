@@ -1,0 +1,8 @@
+---
+import CommunityLayout from '../../layouts/CommunityLayout.astro';
+import { ProgressShareApp } from '../../components/community/ProgressShareApp';
+---
+
+<CommunityLayout title="Progress Share" activePath="/community/progress">
+  <ProgressShareApp client:only="react" />
+</CommunityLayout>

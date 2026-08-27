@@ -18,8 +18,9 @@ export const CommunityController = {
   async getPosts(req: AuthRequest, res: Response): Promise<void> {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const subCommunityId = req.query.subcommunity ? String(req.query.subcommunity) : undefined;
-      const posts = await CommunityService.getPosts(page, 20, subCommunityId);
+      const subCommunityId = req.query.subCommunityId ? String(req.query.subCommunityId) : undefined;
+      const userId = req.user?.id; // undefined for guests
+      const posts = await CommunityService.getPosts(page, 20, subCommunityId, userId);
       res.json(posts);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -87,7 +88,7 @@ export const CommunityController = {
 
   async getChallenges(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const challenges = await CommunityService.getActiveChallenges();
+      const challenges = await CommunityService.getActiveChallenges(req.user?.id);
       res.json(challenges);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -96,8 +97,19 @@ export const CommunityController = {
   
   async joinChallenge(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const participation = await CommunityService.joinChallenge(req.user!.id, String(req.params.id));
-      res.status(201).json(participation);
+      if (!req.user) throw new Error('Not authenticated');
+      await CommunityService.joinChallenge(req.user.id, req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  async syncChallengeProgress(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) throw new Error('Not authenticated');
+      await CommunityService.syncChallengeProgress(req.user.id);
+      res.json({ success: true });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }

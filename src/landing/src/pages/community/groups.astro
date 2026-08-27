@@ -1,0 +1,8 @@
+---
+import CommunityLayout from '../../layouts/CommunityLayout.astro';
+import { SubCommunitiesApp } from '../../components/community/SubCommunitiesApp';
+---
+
+<CommunityLayout title="Sub-Communities" activePath="/community/groups">
+  <SubCommunitiesApp client:only="react" />
+</CommunityLayout>

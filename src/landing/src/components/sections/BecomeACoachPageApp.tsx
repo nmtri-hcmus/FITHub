@@ -8,7 +8,6 @@ export const BecomeACoachPageApp: React.FC = () => {
   const [application, setApplication] = useState<BackendCoachApplication | null>(null);
   const [mounted, setMounted] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const checkStatus = async () => {
@@ -37,14 +36,20 @@ export const BecomeACoachPageApp: React.FC = () => {
     checkStatus();
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || loading) {
+    return (
+      <div className="min-h-screen bg-[#13141c] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   // Not logged in
-  if (!userRole) {
+  if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-[#13141c] text-white flex flex-col items-center justify-center gap-6 px-4 py-20">
         <span className="text-6xl">🔒</span>
-        <h1 className="text-3xl font-extrabold text-center">Login Required</h1>
+        <h1 className="text-3xl font-extrabold text-center">Log in to Apply</h1>
         <p className="text-text-subtle text-center max-w-md">
           Join our network of certified personal trainers. Apply by uploading your certifications for review.
         </p>
@@ -101,7 +106,7 @@ export const BecomeACoachPageApp: React.FC = () => {
         <span className="text-6xl">⏳</span>
         <h1 className="text-3xl font-extrabold text-center">Application Under Review</h1>
         <p className="text-text-subtle text-center max-w-md leading-relaxed">
-          Your application for the Coach role was submitted successfully and is currently in the review queue. 
+          Your application for the Coach role was submitted successfully and is currently in the review queue.{' '}
           Moderators will verify your uploaded certificates shortly.
         </p>
         <div className="bg-[#1e1f26] border border-surface-edge rounded-2xl p-5 w-full max-w-md space-y-3 text-sm">
@@ -170,7 +175,6 @@ export const BecomeACoachPageApp: React.FC = () => {
         onClose={() => setShowModal(false)}
         onSuccess={() => {
           setShowModal(false);
-          setSubmitted(true);
           checkStatus();
         }}
       />

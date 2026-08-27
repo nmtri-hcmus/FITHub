@@ -9,6 +9,7 @@ const path = Astro.url.pathname;
 const isDashboard = path.startsWith('/dashboard');
 const isNutrition = path.startsWith('/log-food') || path.startsWith('/recipes') || path.startsWith('/diet-plan');
 const isCoaching  = path.startsWith('/coaches') || path.startsWith('/coaching');
+const isCommunity = path.startsWith('/community');
 ---
 
 <nav id="main-nav" class={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isLandingPage ? 'nav-landing' : 'nav-inner'}`}>
@@ -100,6 +101,14 @@ const isCoaching  = path.startsWith('/coaches') || path.startsWith('/coaching');
               </div>
             </div>
           </div>
+
+          <!-- Community -->
+          <a
+            href="/community"
+            class={`nav-item px-5 py-2 rounded-full text-xs font-black tracking-[0.12em] uppercase transition-all duration-200 ${isCommunity ? 'nav-item--active' : ''}`}
+          >
+            Community
+          </a>
 
           <!-- Admin link (hidden by default, revealed by JS) -->
           <a
@@ -203,6 +212,15 @@ const isCoaching  = path.startsWith('/coaches') || path.startsWith('/coaching');
             </div>
           </div>
         </div>
+
+        <!-- Community -->
+        <a
+          href="/community"
+          class={`mobile-link flex items-center gap-3 px-4 py-3.5 rounded-2xl ${isCommunity ? 'mobile-link--active' : ''}`}
+        >
+          <span class="text-lg">💬</span>
+          <span class="font-black text-xs tracking-[0.12em] uppercase">Community</span>
+        </a>
 
         <!-- Admin link (hidden by default) -->
         <a id="mobile-admin-link" href="/admin/dashboard" class="mobile-link mobile-link--admin items-center gap-3 px-4 py-3.5 rounded-2xl hidden">
@@ -482,15 +500,48 @@ const isCoaching  = path.startsWith('/coaches') || path.startsWith('/coaching');
   // ────────────────────────────────────────────────────────────
   // ADMIN LINK VISIBILITY
   // ────────────────────────────────────────────────────────────
+  function showAdminLink() {
+    document.getElementById('nav-admin-link')?.classList.remove('hidden');
+    document.getElementById('mobile-admin-link')?.classList.remove('hidden');
+    document.getElementById('mobile-admin-link')?.classList.add('flex');
+  }
+  function hideAdminLink() {
+    document.getElementById('nav-admin-link')?.classList.add('hidden');
+    document.getElementById('mobile-admin-link')?.classList.add('hidden');
+    document.getElementById('mobile-admin-link')?.classList.remove('flex');
+  }
+
+  // Pass 1: instant check from cached localStorage (for instant render)
   try {
     const userStr = localStorage.getItem('fithub_user');
     if (userStr) {
       const user = JSON.parse(userStr);
-      if (user.role === 'ADMIN') {
-        document.getElementById('nav-admin-link')?.classList.remove('hidden');
-        document.getElementById('mobile-admin-link')?.classList.remove('hidden');
-        document.getElementById('mobile-admin-link')?.classList.add('flex');
-      }
+      if (user.role === 'ADMIN') showAdminLink();
+    }
+  } catch { /* ignore */ }
+
+  // Pass 2: verify live role from server (catches role changes without re-login)
+  try {
+    const token = localStorage.getItem('fithub_token');
+    if (token) {
+      fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : null)
+        .then(freshUser => {
+          if (!freshUser) return;
+          // Sync role into localStorage so future page loads are instant
+          try {
+            const cached = JSON.parse(localStorage.getItem('fithub_user') || '{}');
+            cached.role = freshUser.role;
+            localStorage.setItem('fithub_user', JSON.stringify(cached));
+          } catch { /* ignore */ }
+          // Update navbar based on live role
+          if (freshUser.role === 'ADMIN') {
+            showAdminLink();
+          } else {
+            hideAdminLink();
+          }
+        })
+        .catch(() => { /* network error — keep cached state */ });
     }
   } catch { /* ignore */ }
 
