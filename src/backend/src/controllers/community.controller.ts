@@ -98,7 +98,7 @@ export const CommunityController = {
   async joinChallenge(req: AuthRequest, res: Response): Promise<void> {
     try {
       if (!req.user) throw new Error('Not authenticated');
-      await CommunityService.joinChallenge(req.user.id, req.params.id);
+      await CommunityService.joinChallenge(req.user.id, req.params.id as string);
       res.json({ success: true });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
