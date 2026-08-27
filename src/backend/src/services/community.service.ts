@@ -47,22 +47,52 @@ export const CommunityService = {
         title: cleanTitle,
         content: cleanContent,
         authorId: userId,
-        subCommunityId
+        subCommunityId,
+        status: 'PENDING'
       },
       include: { user: { select: { name: true, role: true } } }
     });
   },
 
-  async getPosts(page: number = 1, limit: number = 20, subCommunityId?: string) {
+  async getPosts(page: number = 1, limit: number = 20, subCommunityId?: string, userId?: string) {
     const skip = (page - 1) * limit;
-    
+
+    let whereClause: any = { status: 'APPROVED' };
+
+    if (subCommunityId) {
+      // Viewing a specific sub-community — show only that community's posts
+      whereClause.subCommunityId = subCommunityId;
+    } else {
+      // General forum: show global posts (no subCommunityId) + posts from communities the user has joined
+      if (userId) {
+        // Fetch the sub-community IDs this user is a member of
+        const memberships = await prisma.subCommunityMember.findMany({
+          where: { userId },
+          select: { subCommunityId: true }
+        });
+        const joinedIds = memberships.map((m: { subCommunityId: string }) => m.subCommunityId);
+
+        whereClause = {
+          status: 'APPROVED',
+          OR: [
+            { subCommunityId: null },                       // global posts
+            { subCommunityId: { in: joinedIds } }           // joined community posts
+          ]
+        };
+      } else {
+        // Guest: only global posts
+        whereClause.subCommunityId = null;
+      }
+    }
+
     return prisma.post.findMany({
-      where: subCommunityId ? { subCommunityId } : {},
+      where: whereClause,
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
       include: {
-        user: { select: { name: true, role: true } },
+        user: { select: { name: true, role: true, id: true } },
+        subCommunity: { select: { id: true, name: true } },
         _count: { select: { comments: true } }
       }
     });
@@ -97,14 +127,15 @@ export const CommunityService = {
   },
 
   // --- Challenges ---
-  async getActiveChallenges() {
+  async getActiveChallenges(userId?: string) {
     return prisma.challenge.findMany({
       where: {
         startDate: { lte: new Date() },
         endDate: { gte: new Date() }
       },
       include: {
-        _count: { select: { participants: true } }
+        _count: { select: { participants: true } },
+        ...(userId ? { participants: { where: { userId }, select: { id: true, progress: true, status: true } } } : {})
       }
     });
   },
@@ -113,5 +144,38 @@ export const CommunityService = {
     return prisma.challengeParticipant.create({
       data: { userId, challengeId }
     });
+  },
+
+  async syncChallengeProgress(userId: string) {
+    const participants = await prisma.challengeParticipant.findMany({
+      where: { userId },
+      include: { challenge: true }
+    });
+
+    for (const p of participants) {
+      if (p.challenge.id === 'chal-001') {
+        const count = await prisma.mealLog.count({
+          where: { 
+            userId,
+            date: { gte: p.challenge.startDate, lte: p.challenge.endDate }
+          }
+        });
+        await prisma.challengeParticipant.update({
+          where: { id: p.id },
+          data: { progress: count }
+        });
+      } else if (p.challenge.id === 'chal-002') {
+        const count = await prisma.progressLog.count({
+          where: { 
+            userId,
+            date: { gte: p.challenge.startDate, lte: p.challenge.endDate }
+          }
+        });
+        await prisma.challengeParticipant.update({
+          where: { id: p.id },
+          data: { progress: count }
+        });
+      }
+    }
   }
 };

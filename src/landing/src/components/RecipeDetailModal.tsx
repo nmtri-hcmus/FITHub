@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { Recipe } from '../lib/api';
 import { api } from '../lib/api';
 
@@ -30,11 +30,46 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen || !recipe) return null;
 
   const statusCfg = STATUS_CONFIG[recipe.status] || STATUS_CONFIG.PRIVATE;
   const perServing = { calories: recipe.calories, protein: recipe.protein, carbs: recipe.carbs, fat: recipe.fat };
+
+  const handleShareToCommunity = async (file?: File) => {
+    setIsSharing(true);
+    try {
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const image = reader.result as string;
+          localStorage.setItem(`fithub_recipe_image_${recipe.id}`, image);
+          await api.recipes.update(recipe.id, { status: 'PENDING' });
+          alert('Recipe shared to the community successfully!');
+          onClose();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        await api.recipes.update(recipe.id, { status: 'PENDING' });
+        alert('Recipe shared to the community successfully!');
+        onClose();
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to share recipe');
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  const handleShareClick = () => {
+    if (!localStorage.getItem(`fithub_recipe_image_${recipe.id}`)) {
+      fileInputRef.current?.click();
+    } else {
+      handleShareToCommunity();
+    }
+  };
 
   const handleSaveToLibrary = async () => {
     setIsSaving(true);
@@ -209,6 +244,29 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
               </svg>
               Add to Diet Plan
             </button>
+          )}
+
+          {/* Share to Community: only for owners of private recipes */}
+          {isOwner && recipe.status === 'PRIVATE' && (
+            <>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleShareToCommunity(file);
+                }}
+              />
+              <button
+                onClick={handleShareClick}
+                disabled={isSharing}
+                className="flex-1 min-w-[140px] bg-emerald-600 text-white hover:bg-emerald-700 font-bold py-2.5 px-5 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {isSharing ? 'Sharing...' : 'Share to Community 🏆'}
+              </button>
+            </>
           )}
 
           {/* Delete: only for owners */}

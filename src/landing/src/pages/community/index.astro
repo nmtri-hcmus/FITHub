@@ -1,0 +1,8 @@
+---
+import CommunityLayout from '../../layouts/CommunityLayout.astro';
+import { CommunityFeedApp } from '../../components/community/CommunityFeedApp';
+---
+
+<CommunityLayout title="Community Feed" activePath="/community">
+  <CommunityFeedApp client:only="react" />
+</CommunityLayout>

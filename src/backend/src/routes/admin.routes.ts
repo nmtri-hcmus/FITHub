@@ -24,4 +24,9 @@ router.post('/reports/:id/resolve', requireAdmin, AdminController.resolveReport)
 
 router.post('/users/:id/ban', requireAdmin, AdminController.banUser);
 
+router.get('/pending-posts', requireAdmin, AdminController.getPendingPosts);
+router.post('/approve-post/:id', requireAdmin, AdminController.approvePost);
+
+router.post('/challenges', requireAdmin, AdminController.createChallenge);
+
 export default router;

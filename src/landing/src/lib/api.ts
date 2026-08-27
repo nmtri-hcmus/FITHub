@@ -256,6 +256,7 @@ export const api = {
      */
     getApplications: (): Promise<BackendCoachApplication[]> =>
       request<BackendCoachApplication[]>('/api/coaches/applications'),
+    confirmPayment: (paymentIntentId: string): Promise<any> => request('/api/payment/confirm', { method: 'POST', body: JSON.stringify({ paymentIntentId }) }),
 
     /**
      * Resolve a pending application (Admin only) (UC-22).
@@ -341,6 +342,48 @@ export const api = {
         body: JSON.stringify({ messageId, timestamp, note }),
       }),
   },
+
+  community: {
+    getPosts: (subCommunityId?: string): Promise<BackendPost[]> => {
+      const url = subCommunityId ? `/api/community/posts?subCommunityId=${subCommunityId}` : '/api/community/posts';
+      return request<BackendPost[]>(url);
+    },
+    getPostDetails: (id: string): Promise<BackendPost> => request<BackendPost>(`/api/community/posts/${id}`),
+    createPost: (data: { title: string; content: string; subCommunityId?: string; imageUrl?: string }): Promise<BackendPost> =>
+      request('/api/community/posts', { method: 'POST', body: JSON.stringify(data) }),
+    createComment: (postId: string, content: string): Promise<any> =>
+      request(`/api/community/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ content }) }),
+    getSubCommunities: (): Promise<BackendSubCommunity[]> => request<BackendSubCommunity[]>('/api/community/groups'),
+    createSubCommunity: (data: { name: string; description?: string }): Promise<BackendSubCommunity> =>
+      request('/api/community/groups', { method: 'POST', body: JSON.stringify(data) }),
+    joinSubCommunity: (id: string): Promise<any> =>
+      request(`/api/community/groups/${id}/join`, { method: 'POST' }),
+    getChallenges: (): Promise<BackendChallenge[]> => request<BackendChallenge[]>('/api/community/challenges'),
+    syncChallenges: (): Promise<any> => request('/api/community/challenges/sync', { method: 'POST' }),
+    joinChallenge: (id: string): Promise<any> => request(`/api/community/challenges/${id}/join`, { method: 'POST' }),
+    getLeaderboards: (): Promise<any[]> => request<any[]>('/api/community/leaderboards'),
+  },
+
+  admin: {
+    createReport: (reportedUserId: string, reason: string): Promise<any> =>
+      request(`/api/admin/reports`, { method: 'POST', body: JSON.stringify({ reportedUserId, reason }) }),
+    getReports: (): Promise<BackendReport[]> =>
+      request<BackendReport[]>(`/api/admin/reports`),
+    resolveReport: (reportId: string, decision: string): Promise<any> =>
+      request(`/api/admin/reports/${reportId}/resolve`, { method: 'POST', body: JSON.stringify({ decision }) }),
+    banUser: (userId: string): Promise<any> =>
+      request(`/api/admin/users/${userId}/ban`, { method: 'POST' }),
+    getPendingGroups: (): Promise<BackendSubCommunity[]> =>
+      request<BackendSubCommunity[]>('/api/admin/pending-groups'),
+    approveGroup: (groupId: string, decision: 'APPROVED' | 'REJECTED'): Promise<any> =>
+      request(`/api/admin/approve-group/${groupId}`, { method: 'POST', body: JSON.stringify({ decision }) }),
+    createChallenge: (data: { title: string; description: string; startDate: string; endDate: string; criteria?: any }): Promise<any> =>
+      request(`/api/admin/challenges`, { method: 'POST', body: JSON.stringify(data) }),
+    getPendingPosts: (): Promise<any[]> =>
+      request<any[]>('/api/admin/pending-posts'),
+    approvePost: (postId: string, decision: 'APPROVED' | 'REJECTED'): Promise<any> =>
+      request(`/api/admin/approve-post/${postId}`, { method: 'POST', body: JSON.stringify({ decision }) }),
+  }
 };
 
 
@@ -690,3 +733,108 @@ export interface BackendCoachApplication {
   };
 }
 
+
+export interface BackendPost {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  subCommunityId: string | null;
+  subCommunity?: { id: string; name: string } | null;
+  status?: string;
+  createdAt: string;
+  updatedAt: string;
+  imageUrl?: string;
+  user: { id: string; name: string; role: string };
+  author?: { name: string; id: string };
+  _count?: { comments: number };
+  comments?: any[];
+}
+
+export interface BackendSubCommunity {
+  id: string;
+  name: string;
+  description: string | null;
+  createdById: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  _count?: { members: number; posts: number };
+}
+
+export interface BackendChallenge {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  criteria: any;
+  createdAt: string;
+  updatedAt: string;
+  participants?: any[];
+  _count?: { participants: number };
+}
+
+export interface BackendReport {
+  id: string;
+  reporterId: string;
+  reportedUserId: string;
+  reason: string;
+  status: string;
+  createdAt: string;
+  reporter: { name: string; email: string };
+  reportedUser: { name: string; email: string };
+}
+
+
+export interface BackendPost {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  subCommunityId: string | null;
+  subCommunity?: { id: string; name: string } | null;
+  status?: string;
+  createdAt: string;
+  updatedAt: string;
+  imageUrl?: string;
+  user: { id: string; name: string; role: string };
+  author?: { name: string; id: string };
+  _count?: { comments: number };
+  comments?: any[];
+}
+
+export interface BackendSubCommunity {
+  id: string;
+  name: string;
+  description: string | null;
+  createdById: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  _count?: { members: number; posts: number };
+}
+
+export interface BackendChallenge {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  criteria: any;
+  createdAt: string;
+  updatedAt: string;
+  participants?: any[];
+  _count?: { participants: number };
+}
+
+export interface BackendReport {
+  id: string;
+  reporterId: string;
+  reportedUserId: string;
+  reason: string;
+  status: string;
+  createdAt: string;
+  reporter: { name: string; email: string };
+  reportedUser: { name: string; email: string };
+}

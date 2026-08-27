@@ -44,6 +44,7 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [image, setImage] = useState<string | null>(null);
 
   // Totals (for all servings)
   const totalCalories = ingredients.reduce((sum, ing) => sum + (ing.type === 'db' ? ing.food!.calories : (Number(ing.calories) || 0)), 0);
@@ -99,10 +100,19 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
 
   const removeIngredient = (idx: number) => setIngredients(ingredients.filter((_, i) => i !== idx));
 
-  const updateQuantity = (idx: number, qty: string) => {
+  const updateIngredientQty = (idx: number, val: string) => {
     const next = [...ingredients];
-    next[idx] = { ...next[idx], quantity: qty };
+    next[idx].quantity = val;
     setIngredients(next);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setImage(reader.result as string);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = async () => {
@@ -110,10 +120,14 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
       setError('Please fill in the recipe name, instructions, and at least one ingredient.');
       return;
     }
+    if (status === 'PENDING' && !image) {
+      setError('An image is required to share this recipe with the community.');
+      return;
+    }
     setIsSubmitting(true);
     setError('');
     try {
-      await api.recipes.create({
+      const created = await api.recipes.create({
         recipeName: recipeName.trim(),
         instructions: instructions.trim(),
         calories: perServing.calories,
@@ -126,6 +140,9 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
           quantity: ing.quantity,
         })),
       });
+      if (image) {
+        localStorage.setItem(`fithub_recipe_image_${created.id}`, image);
+      }
       onSave();
       onClose();
       // Reset
@@ -212,6 +229,27 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-primary focus:bg-white outline-none h-28 resize-none"
                 placeholder="Step 1: …&#10;Step 2: …&#10;Step 3: …"
               />
+            </div>
+
+            {/* Image Upload */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+                Recipe Image {status === 'PENDING' && <span className="text-red-500">*</span>}
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+              />
+              {status === 'PENDING' && !image && (
+                <p className="text-xs text-red-500 mt-1">An image is required for community recipes.</p>
+              )}
+              {image && (
+                <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden bg-gray-50 max-h-48 flex items-center justify-center">
+                  <img src={image} alt="Preview" className="max-h-48 object-contain" />
+                </div>
+              )}
             </div>
           </div>
 

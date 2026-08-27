@@ -2,17 +2,16 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/sections/Hero.astro';
 import PersonaSplit from '../components/sections/PersonaSplit.astro';
+import { BestMealBadge } from '../components/sections/BestMealBadge';
+import TraineeFeatures from '../components/sections/TraineeFeatures.astro';
+import CoachFeatures from '../components/sections/CoachFeatures.astro';
 ---
 
 <BaseLayout title="FITHub - AI-Powered Nutrition & Coaching">
   <Hero />
   <PersonaSplit />
+  <BestMealBadge client:load />
   
-  <section id="trainee-features" class="min-h-[50vh] flex items-center justify-center bg-white">
-    <p class="text-gray-400 text-lg">Trainee features coming soon...</p>
-  </section>
-  
-  <section id="coach-features" class="min-h-[50vh] flex items-center justify-center bg-gray-50">
-    <p class="text-gray-400 text-lg">Coach features coming soon...</p>
-  </section>
+  <TraineeFeatures />
+  <CoachFeatures />
 </BaseLayout>
