@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Tesseract from 'tesseract.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import https from 'https';
 import fs from 'fs/promises';
 import { createClient } from 'redis';
@@ -239,39 +239,65 @@ export const FoodService = {
   },
 
   /**
-   * Basic OCR parsing using Tesseract.js
-   * Takes a buffer containing an image and returns the parsed text.
+   * Parses a nutrition label image using Gemini 1.5 Flash Vision.
+   * Takes a buffer containing an image and returns the parsed macros.
    */
   async parseNutritionLabel(imageBuffer: Buffer) {
-    try {
-      // For a production app, we would write this to a temp file or pass the buffer directly.
-      // Tesseract can take a buffer if we specify the format.
-      const result = await Tesseract.recognize(
-        imageBuffer,
-        'eng',
-        { logger: m => console.log(m) }
-      );
-      
-      const text = result.data.text;
-      
-      // Basic heuristic to find Calories (just an example, real parsing would be more robust)
-      let caloriesMatch = text.match(/Calories\s+(\d+)/i);
-      let proteinMatch = text.match(/Protein\s+(\d+)g/i);
-      let carbsMatch = text.match(/Total Carbohydrate\s+(\d+)g/i);
-      let fatMatch = text.match(/Total Fat\s+(\d+)g/i);
-
-      return {
-        rawText: text,
-        estimatedMacros: {
-          calories: caloriesMatch ? parseInt(caloriesMatch[1]) : 0,
-          protein: proteinMatch ? parseInt(proteinMatch[1]) : 0,
-          carbs: carbsMatch ? parseInt(carbsMatch[1]) : 0,
-          fat: fatMatch ? parseInt(fatMatch[1]) : 0
-        }
-      };
-    } catch (error) {
-      console.error('Error running OCR:', error);
-      throw new Error('Failed to parse nutrition label');
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY is not configured on the server.');
     }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    const prompt = `You are a nutrition label parser. Analyze the provided food nutrition label image.
+Extract the following information per serving:
+- calories (number, kcal)
+- protein (number, grams)
+- carbs (number, total carbohydrates in grams)
+- fat (number, total fat in grams)
+- servingSize (string, e.g. "1 cup (240g)" or "30g")
+- productName (string, the product name if visible on the label, otherwise null)
+
+Return ONLY a valid JSON object with these exact keys. Do not include markdown, code blocks, or any extra text.
+Example: {"calories":250,"protein":10,"carbs":30,"fat":8,"servingSize":"1 cup (240g)","productName":"Granola"}`;
+
+    const base64Image = imageBuffer.toString('base64');
+
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: 'image/jpeg',
+          data: base64Image,
+        },
+      },
+    ]);
+
+    const responseText = result.response.text().trim();
+
+    // Strip any accidental markdown fences Gemini sometimes adds
+    const cleaned = responseText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+
+    let macros: any;
+    try {
+      macros = JSON.parse(cleaned);
+    } catch {
+      console.error('[OCR] Gemini returned non-JSON:', responseText);
+      throw new Error('Could not parse nutrition data from the image. Please ensure the label is clear and well-lit.');
+    }
+
+    return {
+      estimatedMacros: {
+        calories: Number(macros.calories) || 0,
+        protein: Number(macros.protein) || 0,
+        carbs: Number(macros.carbs) || 0,
+        fat: Number(macros.fat) || 0,
+      },
+      servingSize: macros.servingSize || null,
+      productName: macros.productName || null,
+    };
   }
 };
+

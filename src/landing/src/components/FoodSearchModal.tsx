@@ -103,12 +103,36 @@ const ScannerPanel: React.FC<ScannerPanelProps> = ({ onFoodFound, onClose }) => 
     if (!file) return;
     setIsProcessing(true);
     setScanError(null);
-    // OCR label reading is a heavy task; for now we simulate and show a helpful message
-    setTimeout(() => {
+    try {
+      // Convert the image file to base64 to send to the backend
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve((reader.result as string).split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const result = await api.food.scanLabel(base64);
+      const { estimatedMacros, servingSize, productName } = result;
+
+      // Map the OCR result into a FoodSearchResult so the rest of the flow works
+      const food: FoodSearchResult = {
+        id: `ocr-${Date.now()}`,
+        name: productName || 'Scanned Nutrition Label',
+        calories: estimatedMacros.calories,
+        protein: estimatedMacros.protein,
+        carbs: estimatedMacros.carbs,
+        fat: estimatedMacros.fat,
+        servingSize: servingSize || '1 serving',
+      };
+
+      onFoodFound(food);
+    } catch (err: any) {
+      setScanError(err.message || 'Could not read the nutrition label. Please ensure the label is clear and well-lit.');
+    } finally {
       setIsProcessing(false);
-      setScanError('OCR label reading is not yet fully supported. Please search manually or use the barcode scanner.');
       if (ocrInputRef.current) ocrInputRef.current.value = '';
-    }, 1200);
+    }
   };
 
   return (

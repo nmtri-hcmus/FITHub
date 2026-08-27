@@ -95,6 +95,11 @@ export const api = {
   food: {
     search: (q: string) => request<FoodSearchResult[]>(`/api/food/search?q=${encodeURIComponent(q)}`),
     barcode: (code: string) => request<FoodSearchResult>(`/api/food/barcode/${code}`),
+    scanLabel: (imageBase64: string) =>
+      request<{ estimatedMacros: { calories: number; protein: number; carbs: number; fat: number }; servingSize: string | null; productName: string | null }>(
+        '/api/food/ocr',
+        { method: 'POST', body: JSON.stringify({ imageBase64 }) }
+      ),
   },
 
   meals: {
