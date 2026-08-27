@@ -3,6 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { api, type MealLog, type MealType } from '../lib/api';
 import { FoodSearchModal } from './FoodSearchModal';
 
+import breakfastSvg from '../assets/breakfast.svg?raw';
+import lunchSvg from '../assets/lunch.svg?raw';
+import dinnerSvg from '../assets/dinner.svg?raw';
+import snackSvg from '../assets/snack.svg?raw';
+
 interface MealSectionProps {
   mealType: MealType;
   meals: MealLog[];
@@ -11,10 +16,17 @@ interface MealSectionProps {
 }
 
 const MEAL_ICONS: Record<MealType, string> = {
-  BREAKFAST: '🌅',
-  LUNCH: '☀️',
-  DINNER: '🌙',
-  SNACK: '⚡',
+  BREAKFAST: breakfastSvg,
+  LUNCH:     lunchSvg,
+  DINNER:    dinnerSvg,
+  SNACK:     snackSvg,
+};
+
+const MEAL_COLORS: Record<MealType, string> = {
+  BREAKFAST: 'text-amber-400',
+  LUNCH:     'text-amber-400',
+  DINNER:    'text-amber-400',
+  SNACK:     'text-amber-400',
 };
 
 const MEAL_LABELS: Record<MealType, string> = {
@@ -54,7 +66,10 @@ export const MealSection: React.FC<MealSectionProps> = ({ mealType, meals, date,
           className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface transition-colors"
         >
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{MEAL_ICONS[mealType]}</span>
+            <span
+              className={`w-7 h-7 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full ${MEAL_COLORS[mealType]}`}
+              dangerouslySetInnerHTML={{ __html: MEAL_ICONS[mealType] }}
+            />
             <div className="text-left">
               <p className="text-white font-bold text-sm">{MEAL_LABELS[mealType]}</p>
               <p className="text-text-muted text-xs">

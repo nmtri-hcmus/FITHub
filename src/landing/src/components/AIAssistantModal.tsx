@@ -4,7 +4,7 @@ import { api, type DailyDashboard, type Recipe, type MealType } from '../lib/api
 
 interface GeneratedRecipeResponse {
   recipeName: string;
-  ingredients: { ingredientName: string; quantity: string }[];
+  ingredients: { ingredientName: string; quantity: string; inDb?: boolean }[];
   instructions: string;
   macros: {
     calories: number;
@@ -21,7 +21,14 @@ interface AIAssistantModalProps {
   onLogged: () => void;
 }
 
-const todayStr = () => new Date().toISOString().split('T')[0];
+const toLocalDate = (d: Date | string) => {
+  const date = typeof d === 'string' ? new Date(d) : d;
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split('T')[0];
+};
+
+const todayStr = () => toLocalDate(new Date());
 
 export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
   isOpen,
@@ -292,8 +299,13 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                     <p className="text-text-muted text-xs font-semibold uppercase tracking-wider mb-2">Ingredients:</p>
                     <ul className="text-text-subtle text-xs list-disc list-inside mb-4 space-y-1">
                       {generatedRecipe.ingredients.map((ing, i) => (
-                        <li key={i}>
+                        <li key={i} className="flex items-center gap-1.5">
                           <span className="text-white font-medium">{ing.ingredientName}</span> ({ing.quantity})
+                          {ing.inDb !== undefined && (
+                            ing.inDb 
+                              ? <span className="text-emerald-400" title="Verified in food database">✓</span> 
+                              : <span className="text-amber-400" title="Not found in food database">⚠️</span>
+                          )}
                         </li>
                       ))}
                     </ul>

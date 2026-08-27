@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { prisma } from '../lib/prisma';
+import { FoodService } from './food.service';
 
 // Initialize the Gemini client from the environment variable
 const genAI = process.env.GEMINI_API_KEY
@@ -14,7 +15,7 @@ interface GenerateRecipeInput {
 
 interface GeneratedRecipe {
   recipeName: string;
-  ingredients: { ingredientName: string; quantity: string }[];
+  ingredients: { ingredientName: string; quantity: string; inDb?: boolean }[];
   instructions: string;
   macros: {
     calories: number;
@@ -131,6 +132,16 @@ Output ONLY valid JSON in this exact format, with no other text, no markdown, no
           throw new Error('Incomplete recipe structure from AI');
         }
 
+        // Verify ingredients against food database
+        await Promise.all(parsed.ingredients.map(async (ing) => {
+          try {
+            const results = await FoodService.searchFood(ing.ingredientName);
+            ing.inDb = results.length > 0;
+          } catch (e) {
+            ing.inDb = false;
+          }
+        }));
+
         return parsed;
       } catch (error: any) {
         attempts++;
@@ -150,6 +161,7 @@ Output ONLY valid JSON in this exact format, with no other text, no markdown, no
       ingredients: availableIngredients.map((name) => ({
         ingredientName: name,
         quantity: '1 serving',
+        inDb: true,
       })),
       instructions: '1. Prepare all ingredients.\n2. Cook them according to package instructions.\n3. Combine and enjoy your macro-friendly meal!',
       macros: {

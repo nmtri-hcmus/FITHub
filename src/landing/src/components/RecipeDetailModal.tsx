@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import type { Recipe } from '../lib/api';
 import { api } from '../lib/api';
 
@@ -13,9 +13,9 @@ interface RecipeDetailModalProps {
 }
 
 const STATUS_CONFIG = {
-  APPROVED: { label: 'Community Approved', color: 'bg-emerald-100 text-emerald-700 border border-emerald-200' },
+  APPROVED: { label: 'Community Approved', color: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' },
   PENDING:  { label: 'Awaiting Review',    color: 'bg-amber-100 text-amber-700 border border-amber-200' },
-  PRIVATE:  { label: 'Private',            color: 'bg-gray-100 text-gray-600 border border-gray-200' },
+  PRIVATE:  { label: 'Private',            color: 'bg-surface-edge text-text-muted border border-surface-edge' },
 };
 
 export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
@@ -122,15 +122,15 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-2xl bg-white rounded-[2rem] shadow-2xl flex flex-col max-h-[92vh] border border-gray-200 overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-surface rounded-[2rem] shadow-2xl flex flex-col max-h-[92vh] border border-surface-edge overflow-hidden">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-gray-100">
+        <div className="px-6 pt-6 pb-4 border-b border-surface-edge">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-black text-gray-900 leading-tight">{recipe.recipeName}</h2>
+              <h2 className="text-2xl font-black text-white leading-tight">{recipe.recipeName}</h2>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 {recipe.user?.name && (
-                  <span className="text-xs text-gray-500">By {recipe.user.name}</span>
+                  <span className="text-xs text-text-muted">By {recipe.user.name}</span>
                 )}
                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${statusCfg.color}`}>
                   {statusCfg.label}
@@ -139,7 +139,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="shrink-0 p-2 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors"
+              className="shrink-0 p-2 rounded-full bg-surface-edge text-text-muted hover:bg-gray-800 hover:text-gray-200 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -156,8 +156,8 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
               { label: 'Fat',      val: Math.round(perServing.fat),      unit: 'g',    color: 'bg-red-50 border-red-100' },
             ].map(m => (
               <div key={m.label} className={`${m.color} border rounded-xl p-3 text-center`}>
-                <p className="text-lg font-black text-gray-900">{m.val}<span className="text-xs font-normal text-gray-500">{m.unit}</span></p>
-                <p className="text-[10px] text-gray-500 uppercase font-semibold tracking-wide mt-0.5">{m.label}</p>
+                <p className="text-lg font-black text-white">{m.val}<span className="text-xs font-normal text-text-muted">{m.unit}</span></p>
+                <p className="text-[10px] text-text-muted uppercase font-semibold tracking-wide mt-0.5">{m.label}</p>
               </div>
             ))}
           </div>
@@ -167,35 +167,35 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
         <div className="overflow-y-auto flex-1 px-6 py-5 space-y-6">
           {/* Ingredients */}
           <div>
-            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary-dark text-xs">🧂</span>
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary-dark text-xs">đŸ§‚</span>
               Ingredients
             </h3>
             {recipe.ingredients.length > 0 ? (
               <ul className="space-y-1.5">
                 {recipe.ingredients.map((ing, idx) => (
-                  <li key={idx} className="flex justify-between items-center text-sm py-2 px-3 rounded-xl bg-gray-50 border border-gray-100">
-                    <span className="text-gray-800 font-medium">{ing.ingredientName}</span>
-                    <span className="text-gray-500 text-xs font-semibold">{ing.quantity}</span>
+                  <li key={idx} className="flex justify-between items-center text-sm py-2 px-3 rounded-xl bg-surface-alt border border-surface-edge">
+                    <span className="text-gray-200 font-medium">{ing.ingredientName}</span>
+                    <span className="text-text-muted text-xs font-semibold">{ing.quantity}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-400 italic">No ingredients listed.</p>
+              <p className="text-sm text-text-subtle italic">No ingredients listed.</p>
             )}
           </div>
 
           {/* Instructions */}
           {steps.length > 0 && (
             <div>
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary-dark text-xs">📋</span>
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary-dark text-xs">đŸ“‹</span>
                 Instructions
               </h3>
               <ol className="space-y-2">
                 {steps.map((step, idx) => (
-                  <li key={idx} className="flex gap-3 text-sm text-gray-700 leading-relaxed">
-                    <span className="shrink-0 w-6 h-6 rounded-full bg-primary text-gray-900 font-black flex items-center justify-center text-xs mt-0.5">
+                  <li key={idx} className="flex gap-3 text-sm text-gray-300 leading-relaxed">
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs mt-0.5">
                       {idx + 1}
                     </span>
                     <span>{step}</span>
@@ -207,13 +207,13 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-wrap items-center gap-3">
+        <div className="px-6 py-4 border-t border-surface-edge bg-surface-alt flex flex-wrap items-center gap-3">
           {/* Save to library: only for community recipes (non-owners) */}
           {recipe.status === 'APPROVED' && !isOwner && (
             <button
               onClick={handleSaveToLibrary}
               disabled={isSaving || saved}
-              className="flex-1 min-w-[140px] bg-gray-100 text-gray-800 hover:bg-gray-200 font-bold py-2.5 px-5 rounded-xl transition-colors text-sm border border-gray-200 flex items-center justify-center gap-2 disabled:opacity-60"
+              className="flex-1 min-w-[140px] bg-surface-edge text-gray-200 hover:bg-gray-800 font-bold py-2.5 px-5 rounded-xl transition-colors text-sm border border-surface-edge flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {saved ? (
                 <>
@@ -237,7 +237,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
           {onSchedule && (
             <button
               onClick={() => { onSchedule(recipe); onClose(); }}
-              className="flex-1 min-w-[140px] bg-primary text-gray-900 hover:bg-primary-light font-bold py-2.5 px-5 rounded-xl transition-colors text-sm border border-primary-dark/15 flex items-center justify-center gap-2"
+              className="flex-1 min-w-[140px] bg-primary text-white hover:bg-primary-light font-bold py-2.5 px-5 rounded-xl transition-colors text-sm border border-primary-dark/15 flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -264,7 +264,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                 disabled={isSharing}
                 className="flex-1 min-w-[140px] bg-emerald-600 text-white hover:bg-emerald-700 font-bold py-2.5 px-5 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                {isSharing ? 'Sharing...' : 'Share to Community 🏆'}
+                {isSharing ? 'Sharing...' : 'Share to Community đŸ†'}
               </button>
             </>
           )}
@@ -287,3 +287,4 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
     </div>
   );
 };
+

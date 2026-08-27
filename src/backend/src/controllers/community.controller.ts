@@ -66,6 +66,15 @@ export const CommunityController = {
     }
   },
 
+  async getMySubCommunities(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const subs = await CommunityService.getMySubCommunities(req.user!.id);
+      res.json(subs);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
   async joinSubCommunity(req: AuthRequest, res: Response): Promise<void> {
     try {
       const membership = await CommunityService.joinSubCommunity(req.user!.id, String(req.params.id));

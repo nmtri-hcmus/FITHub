@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import type { Recipe } from '../lib/api';
 import { api } from '../lib/api';
 
@@ -11,9 +11,9 @@ interface RecipeCardProps {
 }
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-  APPROVED: { label: 'Community',      className: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+  APPROVED: { label: 'Community',      className: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' },
   PENDING:  { label: 'Awaiting Review', className: 'bg-amber-50 text-amber-700 border border-amber-200' },
-  PRIVATE:  { label: 'Private',         className: 'bg-gray-100 text-gray-600 border border-gray-200' },
+  PRIVATE:  { label: 'Private',         className: 'bg-surface-edge text-text-muted border border-surface-edge' },
 };
 
 export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isOwner, onDelete, onSchedule, onClick }) => {
@@ -38,13 +38,13 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isOwner, onDelet
   return (
     <div
       onClick={() => onClick?.(recipe)}
-      className="bg-white rounded-2xl p-5 flex flex-col h-full border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all relative overflow-hidden group cursor-pointer"
+      className="bg-surface rounded-2xl p-5 flex flex-col h-full border border-surface-edge shadow-sm hover:shadow-md hover:border-gray-700 transition-all relative overflow-hidden group cursor-pointer"
     >
       {/* Header */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-bold text-gray-900 leading-tight truncate">{recipe.recipeName}</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h3 className="text-base font-bold text-white leading-tight truncate">{recipe.recipeName}</h3>
+          <p className="text-xs text-text-muted mt-0.5">
             {recipe.user?.name ? `By ${recipe.user.name}` : 'Custom Recipe'}
           </p>
         </div>
@@ -63,20 +63,20 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isOwner, onDelet
           { label: 'Carb', val: `${Math.round(recipe.carbs)}g` },
           { label: 'Fat',  val: `${Math.round(recipe.fat)}g` },
         ].map(m => (
-          <div key={m.label} className="bg-gray-50 border border-gray-100 rounded-lg py-1.5 flex flex-col items-center">
-            <span className="text-xs font-bold text-gray-900">{m.val}</span>
-            <span className="text-[9px] text-gray-500 uppercase">{m.label}</span>
+          <div key={m.label} className="bg-surface-alt border border-surface-edge rounded-lg py-1.5 flex flex-col items-center">
+            <span className="text-xs font-bold text-white">{m.val}</span>
+            <span className="text-[9px] text-text-muted uppercase">{m.label}</span>
           </div>
         ))}
       </div>
 
       {/* Instructions preview */}
-      <div className="text-xs text-gray-500 line-clamp-2 mb-4 flex-1 leading-relaxed">
+      <div className="text-xs text-text-muted line-clamp-2 mb-4 flex-1 leading-relaxed">
         {recipe.instructions || 'No instructions provided.'}
       </div>
 
       {/* "View details" hint */}
-      <div className="text-[10px] text-gray-400 font-medium mb-3 flex items-center gap-1">
+      <div className="text-[10px] text-text-subtle font-medium mb-3 flex items-center gap-1">
         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -89,7 +89,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isOwner, onDelet
         {onSchedule && (
           <button
             onClick={(e) => { e.stopPropagation(); onSchedule(recipe); }}
-            className="flex-1 bg-primary text-gray-900 font-bold py-2 rounded-xl hover:bg-primary-light transition-colors text-xs border border-primary-dark/15"
+            className="flex-1 bg-primary text-white font-bold py-2 rounded-xl hover:bg-primary-light transition-colors text-xs border border-primary-dark/15"
           >
             Add to Plan
           </button>
@@ -110,3 +110,4 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, isOwner, onDelet
     </div>
   );
 };
+

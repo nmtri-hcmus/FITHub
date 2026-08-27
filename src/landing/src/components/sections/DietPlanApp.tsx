@@ -3,6 +3,13 @@ import { DietCalendar } from '../DietCalendar';
 import { GroceryListModal } from '../GroceryListModal';
 import { getISOWeek } from '../../lib/api';
 
+// SVG icons (imported as strings via ?raw, inlined at build time)
+import weeklyPlanSvg from '../../assets/weekly-plan.diet-plan.svg?raw';
+import breakfastSvg from '../../assets/breakfast.svg?raw';
+import lunchSvg from '../../assets/lunch.svg?raw';
+import dinnerSvg from '../../assets/dinner.svg?raw';
+import snackSvg from '../../assets/snack.svg?raw';
+
 export const DietPlanApp: React.FC = () => {
   const [isGroceryListOpen, setIsGroceryListOpen] = useState(false);
   const [currentWeek, setCurrentWeek] = useState<string>(getISOWeek(new Date()));
@@ -17,7 +24,10 @@ export const DietPlanApp: React.FC = () => {
         <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-2xl bg-primary/15 border border-primary/20 flex items-center justify-center text-xl">📅</div>
+              <div
+                className="w-10 h-10 rounded-2xl bg-primary/15 border border-primary/20 flex items-center justify-center text-primary [&>svg]:w-5 [&>svg]:h-5"
+                dangerouslySetInnerHTML={{ __html: weeklyPlanSvg }}
+              />
               <span className="text-xs font-bold text-primary uppercase tracking-widest">Diet Calendar</span>
             </div>
             <h1 className="text-3xl font-black text-white leading-tight">Weekly Meal Planner</h1>
@@ -27,8 +37,15 @@ export const DietPlanApp: React.FC = () => {
 
             {/* Quick stat pills */}
             <div className="flex flex-wrap gap-2 mt-4">
-              <span className="text-[11px] font-semibold text-text-subtle bg-surface border border-surface-edge px-3 py-1 rounded-full">
-                🌅 Breakfast · ☀️ Lunch · 🌙 Dinner · 🍎 Snack
+              <span className="text-[11px] font-semibold text-text-subtle bg-surface border border-surface-edge px-3 py-1 rounded-full flex items-center gap-1.5">
+                <span className="inline-flex w-3.5 h-3.5 text-amber-400 [&>svg]:w-full [&>svg]:h-full" dangerouslySetInnerHTML={{ __html: breakfastSvg }} />
+                Breakfast ·{' '}
+                <span className="inline-flex w-3.5 h-3.5 text-amber-400 [&>svg]:w-full [&>svg]:h-full" dangerouslySetInnerHTML={{ __html: lunchSvg }} />
+                Lunch ·{' '}
+                <span className="inline-flex w-3.5 h-3.5 text-amber-400 [&>svg]:w-full [&>svg]:h-full" dangerouslySetInnerHTML={{ __html: dinnerSvg }} />
+                Dinner ·{' '}
+                <span className="inline-flex w-3.5 h-3.5 text-amber-400 [&>svg]:w-full [&>svg]:h-full" dangerouslySetInnerHTML={{ __html: snackSvg }} />
+                Snack
               </span>
               <span className="text-[11px] font-semibold text-text-subtle bg-surface border border-surface-edge px-3 py-1 rounded-full">
                 Week: {currentWeek}

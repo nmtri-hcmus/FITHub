@@ -31,6 +31,14 @@ export const CommunityService = {
     });
   },
 
+  async getMySubCommunities(userId: string) {
+    const memberships = await prisma.subCommunityMember.findMany({
+      where: { userId },
+      include: { subCommunity: true }
+    });
+    return memberships.map(m => m.subCommunity);
+  },
+
   async joinSubCommunity(userId: string, subCommunityId: string) {
     return prisma.subCommunityMember.create({
       data: { userId, subCommunityId }

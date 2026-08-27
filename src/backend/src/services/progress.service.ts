@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma';
+import { calculateMacros } from '../utils/macros';
 
 export class ProgressService {
   
@@ -12,11 +13,21 @@ export class ProgressService {
       }
     });
 
-    // Optionally update their current weight in their biometrics so their macros stay accurate
-    await prisma.userBiometrics.updateMany({
-      where: { userId },
-      data: { weight: data.bodyWeight }
-    });
+    const bio = await prisma.userBiometrics.findUnique({ where: { userId } });
+    if (bio) {
+      const macros = calculateMacros(data.bodyWeight, bio.height, bio.age, bio.gender, bio.activityLevel, bio.goal);
+      
+      await prisma.userBiometrics.update({
+        where: { userId },
+        data: { 
+          weight: data.bodyWeight,
+          dailyCalories: macros.dailyCalories,
+          protein: macros.protein,
+          carbs: macros.carbs,
+          fat: macros.fat
+        }
+      });
+    }
 
     return log;
   }

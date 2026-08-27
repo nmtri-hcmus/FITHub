@@ -13,6 +13,7 @@ router.post('/posts/:id/comments', requireAuth, CommunityController.createCommen
 // Sub-Communities
 router.post('/groups', requireAuth, CommunityController.createSubCommunity);
 router.get('/groups', CommunityController.getSubCommunities);
+router.get('/groups/me', requireAuth, CommunityController.getMySubCommunities);
 router.post('/groups/:id/join', requireAuth, CommunityController.joinSubCommunity);
 
 // Gamification

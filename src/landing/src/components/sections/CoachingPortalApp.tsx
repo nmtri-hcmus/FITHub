@@ -59,7 +59,7 @@ const ChatBubble: React.FC<{
       <div
         className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
           isMe
-            ? 'bg-primary text-[#0a0d0e] rounded-tr-none'
+            ? 'bg-[#252630] border border-surface-edge text-white rounded-tr-none'
             : 'bg-[#1e1f26] border border-surface-edge text-white rounded-tl-none'
         }`}
       >
@@ -80,11 +80,7 @@ const ChatBubble: React.FC<{
             />
             <button
               onClick={() => onAnalyze?.(msg)}
-              className={`w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2 transition-colors ${
-                isMe
-                  ? 'bg-black/10 hover:bg-black/20 text-[#0a0d0e]'
-                  : 'bg-black/20 hover:bg-black/30 text-white'
-              }`}
+              className="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2 transition-colors bg-black/20 hover:bg-black/30 text-white"
             >
               <span className="text-xs font-bold flex items-center gap-1.5">
                 📹 Form Check ({msg.videoDuration ?? '?'}s)
@@ -103,20 +99,18 @@ const ChatBubble: React.FC<{
             {msg.feedbackNotes.map(n => (
               <div
                 key={n.id}
-                className={`rounded-lg px-2 py-1.5 text-xs ${
-                  isMe ? 'bg-black/10 text-[#0a0d0e]' : 'bg-black/20 text-white'
-                }`}
+                className="rounded-lg px-2 py-1.5 text-xs bg-black/20 text-white"
               >
-                <span className={`font-bold ${isMe ? 'text-black' : 'text-amber-300'}`}>At {n.timestamp}s:</span>
+                <span className="font-bold text-amber-300">At {n.timestamp}s:</span>
                 <span className="ml-1 opacity-90">{n.note}</span>
               </div>
             ))}
           </div>
         )}
 
-        <p className={`text-[10px] text-right mt-2 ${isMe ? 'text-[#0a0d0e]/60' : 'opacity-50'}`}>
-          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </p>
+          <p className="text-[10px] text-right mt-2 opacity-50">
+            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </p>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import type { BackendSubCommunity } from '../../lib/api';
 
@@ -63,8 +63,8 @@ export const SubCommunitiesApp: React.FC = () => {
       {/* Header & Filters */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-black text-black tracking-tight mb-2">Sub-Communities</h1>
-          <p className="text-gray-500 font-medium">Find local workout partners and connect with like-minded athletes.</p>
+          <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight mb-2">Sub-Communities</h1>
+          <p className="text-text-muted font-medium">Find local workout partners and connect with like-minded athletes.</p>
         </div>
         <button 
           onClick={() => setIsCreateOpen(true)}
@@ -76,13 +76,13 @@ export const SubCommunitiesApp: React.FC = () => {
 
       <div className="flex flex-col lg:flex-row gap-4 mb-8">
         <div className="relative w-full lg:w-72 shrink-0">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">📍</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-subtle">đŸ“</span>
           <input 
             type="text" 
             placeholder="Search by City or Region..." 
             value={locationSearch}
             onChange={(e) => setLocationSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 font-medium text-sm shadow-sm"
+            className="w-full pl-11 pr-4 py-3 bg-surface border border-surface-edge rounded-xl focus:ring-2 focus:ring-emerald-500 font-medium text-sm shadow-sm"
           />
         </div>
         <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar w-full items-center">
@@ -93,7 +93,7 @@ export const SubCommunitiesApp: React.FC = () => {
               className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-colors border
                 ${activeCategory === cat 
                   ? 'bg-black text-white border-black' 
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                  : 'bg-surface text-text-muted border-surface-edge hover:bg-surface-alt'}`}
             >
               {cat}
             </button>
@@ -107,10 +107,10 @@ export const SubCommunitiesApp: React.FC = () => {
           <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : filteredGroups.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-gray-200 rounded-3xl">
-          <div className="text-4xl mb-4">🌍</div>
-          <h3 className="text-xl font-black text-gray-900 mb-2">No groups found</h3>
-          <p className="text-gray-500">Try adjusting your filters or create a new group.</p>
+        <div className="text-center py-20 bg-surface border border-surface-edge rounded-3xl">
+          <div className="text-4xl mb-4">đŸŒ</div>
+          <h3 className="text-xl font-black text-white mb-2">No groups found</h3>
+          <p className="text-text-muted">Try adjusting your filters or create a new group.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -138,16 +138,16 @@ const GroupCard: React.FC<{ group: EnrichedGroup, onJoin: () => void, currentUse
   return (
     <div 
       onClick={handleCardClick}
-      className={`bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all ${!isPending ? 'cursor-pointer' : ''}`}>
+      className={`bg-surface border border-surface-edge rounded-2xl overflow-hidden shadow-sm flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all ${!isPending ? 'cursor-pointer' : ''}`}>
       {/* Header */}
-      <div className="h-32 bg-gray-200 relative">
+      <div className="h-32 bg-gray-800 relative">
         <img src={group.bannerUrl || `https://images.unsplash.com/photo-1554284126-aa88f22d8b74?q=80&w=800&auto=format&fit=crop&sig=${group.id}`} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-white/20 flex items-center gap-1.5">
-          <span>📍</span> HCMC, District 1
+          <span>đŸ“</span> HCMC, District 1
         </div>
         {isPending && (
-          <div className="absolute top-3 right-3 bg-amber-500 text-black text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg">
+          <div className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg">
             Pending Mod Validation
           </div>
         )}
@@ -155,22 +155,22 @@ const GroupCard: React.FC<{ group: EnrichedGroup, onJoin: () => void, currentUse
 
       {/* Body */}
       <div className="p-5 flex-1 flex flex-col">
-        <h3 className="text-xl font-black text-gray-900 mb-1 leading-tight">{group.name}</h3>
-        <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">{group.description}</p>
+        <h3 className="text-xl font-black text-white mb-1 leading-tight">{group.name}</h3>
+        <p className="text-sm text-text-muted line-clamp-2 mb-4 flex-1">{group.description}</p>
         
-        <div className="flex items-center gap-4 text-xs font-bold text-gray-500 mb-5">
-          <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
-            <span className="text-emerald-500 text-base">👥</span> {group._count?.members || Math.floor(Math.random() * 150) + 12} Members
+        <div className="flex items-center gap-4 text-xs font-bold text-text-muted mb-5">
+          <div className="flex items-center gap-1.5 bg-surface-alt px-2 py-1 rounded-md border border-surface-edge">
+            <span className="text-emerald-500 text-base">đŸ‘¥</span> {group._count?.members || Math.floor(Math.random() * 150) + 12} Members
           </div>
           <div className="flex items-center gap-1.5 text-orange-500">
-            <span>🔥</span> Active today
+            <span>đŸ”¥</span> Active today
           </div>
         </div>
 
         {/* Footer */}
         {isJoined ? (
           <button onClick={(e) => e.stopPropagation()} disabled className="w-full bg-black text-white py-3 rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2">
-            <span>✓</span> Joined
+            <span>âœ“</span> Joined
           </button>
         ) : (
           <button 
@@ -178,8 +178,8 @@ const GroupCard: React.FC<{ group: EnrichedGroup, onJoin: () => void, currentUse
             disabled={isPending}
             className={`w-full py-3 rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors border-2
               ${isPending 
-                ? 'bg-gray-100 border-gray-100 text-gray-400 cursor-not-allowed' 
-                : 'bg-white border-emerald-500 text-emerald-600 hover:bg-emerald-50'}`}
+                ? 'bg-surface-edge border-surface-edge text-text-subtle cursor-not-allowed' 
+                : 'bg-surface border-emerald-500 text-emerald-600 hover:bg-emerald-500/10'}`}
           >
             Join Group
           </button>
@@ -238,56 +238,56 @@ const CreateGroupSlideboard: React.FC<{ onClose: () => void, onCreated: () => vo
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-fadeInRight">
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-black text-black">Create Sub-Community</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-black text-2xl leading-none">&times;</button>
+      <div className="w-full max-w-md bg-surface h-full shadow-2xl flex flex-col animate-fadeInRight">
+        <div className="p-4 border-b border-surface-edge flex items-center justify-between">
+          <h2 className="text-lg font-black text-white">Create Sub-Community</h2>
+          <button onClick={onClose} className="text-text-subtle hover:text-white text-2xl leading-none">&times;</button>
         </div>
 
         <div className="p-6 flex-1 overflow-y-auto space-y-6">
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 text-sm text-blue-800">
-            <span className="text-xl">ℹ️</span>
+            <span className="text-xl">â„¹ï¸</span>
             <p><strong>Notice:</strong> All sub-community proposals undergo moderator review before going live to the public.</p>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Group Name</label>
+            <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1.5">Group Name</label>
             <input 
               type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. District 1 Morning Runners"
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm font-medium"
+              className="w-full p-3 bg-surface-alt border border-surface-edge rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm font-medium"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Category</label>
+              <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1.5">Category</label>
               <select 
                 value={category} onChange={e => setCategory(e.target.value)}
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm font-medium"
+                className="w-full p-3 bg-surface-alt border border-surface-edge rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm font-medium"
               >
                 {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">City / Region</label>
+              <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1.5">City / Region</label>
               <input 
                 type="text" value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. HCMC"
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm font-medium"
+                className="w-full p-3 bg-surface-alt border border-surface-edge rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm font-medium"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Description</label>
+            <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1.5">Description</label>
             <textarea 
               value={description} onChange={e => setDescription(e.target.value)} placeholder="What is this group about? Who should join?"
               rows={4}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm resize-none"
+              className="w-full p-3 bg-surface-alt border border-surface-edge rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Cover Image</label>
+            <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1.5">Cover Image</label>
             <input
               ref={fileInputRef}
               type="file"
@@ -299,7 +299,7 @@ const CreateGroupSlideboard: React.FC<{ onClose: () => void, onCreated: () => vo
               onClick={() => fileInputRef.current?.click()}
               onDrop={handleDrop}
               onDragOver={e => e.preventDefault()}
-              className="w-full border-2 border-dashed border-gray-300 rounded-xl transition-colors cursor-pointer hover:border-emerald-500 hover:bg-emerald-50"
+              className="w-full border-2 border-dashed border-gray-700 rounded-xl transition-colors cursor-pointer hover:border-emerald-500 hover:bg-emerald-500/10"
             >
               {imagePreview ? (
                 <div className="relative">
@@ -308,24 +308,24 @@ const CreateGroupSlideboard: React.FC<{ onClose: () => void, onCreated: () => vo
                     onClick={e => { e.stopPropagation(); setImagePreview(null); setImageName(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
                     className="absolute top-2 right-2 bg-black/60 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm hover:bg-black transition-colors"
                   >
-                    ✕
+                    âœ•
                   </button>
-                  <div className="px-3 py-2 text-xs text-gray-500 font-medium truncate border-t border-gray-100">
+                  <div className="px-3 py-2 text-xs text-text-muted font-medium truncate border-t border-surface-edge">
                     {imageName}
                   </div>
                 </div>
               ) : (
-                <div className="p-8 text-center text-gray-500 text-sm">
-                  <div className="text-3xl mb-2">📸</div>
+                <div className="p-8 text-center text-text-muted text-sm">
+                  <div className="text-3xl mb-2">đŸ“¸</div>
                   <p className="font-semibold">Click to browse or drag & drop banner</p>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 10MB</p>
+                  <p className="text-xs text-text-subtle mt-1">PNG, JPG up to 10MB</p>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
+        <div className="p-6 border-t border-surface-edge bg-surface-alt">
           <button 
             onClick={handleSubmit} disabled={submitting || !name || !description || !location}
             className="w-full bg-black text-white py-3.5 rounded-xl font-black tracking-wider uppercase hover:bg-gray-800 disabled:opacity-50 transition-colors shadow-lg shadow-black/10"
@@ -337,3 +337,9 @@ const CreateGroupSlideboard: React.FC<{ onClose: () => void, onCreated: () => vo
     </div>
   );
 };
+
+
+
+
+
+

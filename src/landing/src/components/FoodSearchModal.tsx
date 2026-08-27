@@ -51,7 +51,7 @@ const SkeletonRow: React.FC = () => (
   </div>
 );
 
-// ── Scanner Mode (UC-06) ─────────────────────────────────────────────────────
+// â”€â”€ Scanner Mode (UC-06) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type ScanMode = 'BARCODE' | 'OCR';
 
 interface ScannerPanelProps {
@@ -184,7 +184,7 @@ const ScannerPanel: React.FC<ScannerPanelProps> = ({ onFoodFound, onClose }) => 
           <>
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <p className="text-text-muted text-xs">
-              {scanMode === 'BARCODE' ? 'Reading barcode…' : 'Scanning label…'}
+              {scanMode === 'BARCODE' ? 'Reading barcodeâ€¦' : 'Scanning labelâ€¦'}
             </p>
             {/* Animated scan line */}
             <div className="absolute left-4 right-4 h-0.5 bg-primary/60 animate-bounce" style={{ top: '50%' }} />
@@ -226,13 +226,111 @@ const ScannerPanel: React.FC<ScannerPanelProps> = ({ onFoodFound, onClose }) => 
       )}
 
       <button onClick={onClose} className="text-center text-xs text-text-muted hover:text-white transition-colors">
-        ← Back to search
+        â† Back to search
       </button>
     </div>
   );
 };
 
-// ── Manual Entry Panel (UC-04 A1) ─────────────────────────────────────────
+// â”€â”€ Manual Entry Panel (UC-04 A1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Recipe List Panel ────────────────────────────────────────────────────────
+interface RecipeListPanelProps {
+  mealType: MealType;
+  date: string;
+  onLogged: () => void;
+  onClose: () => void;
+}
+
+const RecipeListPanel: React.FC<RecipeListPanelProps> = ({ mealType, date, onLogged, onClose }) => {
+  const [recipes, setRecipes] = React.useState<any[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLogging, setIsLogging] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    Promise.all([
+      api.recipes.getMine().catch(() => []),
+      api.recipes.getApproved().catch(() => []),
+    ]).then(([mine, approved]) => {
+      const all = [...mine, ...approved];
+      const unique = Array.from(new Map(all.map(r => [r.id, r])).values());
+      setRecipes(unique);
+      setIsLoading(false);
+    });
+  }, []);
+
+  const handleLogRecipe = async (recipe: any) => {
+    setIsLogging(recipe.id);
+    try {
+      await api.meals.log({
+        date,
+        mealType,
+        foodItemName: recipe.recipeName + " (Recipe)",
+        calories: recipe.calories,
+        protein: recipe.protein,
+        carbs: recipe.carbs,
+        fat: recipe.fat,
+      });
+      onLogged();
+      onClose();
+    } catch (err: any) {
+      alert(err.message || 'Failed to log recipe');
+    } finally {
+      setIsLogging(null);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <button onClick={onClose} className="p-1.5 text-text-muted hover:text-white transition-colors bg-surface border border-surface-edge rounded-lg">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div>
+          <h4 className="text-white font-bold text-sm">Log a Recipe</h4>
+          <p className="text-text-subtle text-xs">Choose from your saved recipes</p>
+        </div>
+      </div>
+
+      <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-3">
+        {isLoading ? (
+          <>
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </>
+        ) : recipes.length === 0 ? (
+          <p className="text-text-muted text-sm text-center py-8">No recipes found. Save some recipes first!</p>
+        ) : (
+          recipes.map(recipe => (
+            <div key={recipe.id} className="bg-surface border border-surface-edge rounded-2xl p-4 flex flex-col gap-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h5 className="text-white font-bold text-sm">{recipe.recipeName}</h5>
+                  <p className="text-primary text-xs font-bold mt-0.5">{recipe.calories} kcal</p>
+                </div>
+                <button
+                  onClick={() => handleLogRecipe(recipe)}
+                  disabled={isLogging === recipe.id}
+                  className="bg-primary text-surface px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-primary-light transition-colors disabled:opacity-50"
+                >
+                  {isLogging === recipe.id ? 'Logging...' : 'Log Recipe'}
+                </button>
+              </div>
+              <div className="flex items-center gap-4 text-xs font-medium">
+                <span className="text-blue-400">P: {recipe.protein}g</span>
+                <span className="text-yellow-400">C: {recipe.carbs}g</span>
+                <span className="text-orange-400">F: {recipe.fat}g</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
 interface ManualEntryPanelProps {
   mealType: MealType;
   date: string;
@@ -379,14 +477,14 @@ const ManualEntryPanel: React.FC<ManualEntryPanelProps> = ({ mealType, date, onL
         className="w-full bg-primary text-surface font-bold py-3.5 rounded-xl hover:bg-primary-light transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {isLogging && <div className="w-4 h-4 border-2 border-surface border-t-transparent rounded-full animate-spin" />}
-        {isLogging ? 'Logging…' : `Add to ${MEAL_LABELS[mealType]}`}
+        {isLogging ? 'Loggingâ€¦' : `Add to ${MEAL_LABELS[mealType]}`}
       </button>
     </div>
   );
 };
 
-// ── Main Modal ────────────────────────────────────────────────────────────────
-type ModalView = 'SEARCH' | 'SCANNER' | 'MANUAL';
+// â”€â”€ Main Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+type ModalView = 'SEARCH' | 'SCANNER' | 'MANUAL' | 'RECIPES';
 
 export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
   isOpen,
@@ -566,10 +664,22 @@ export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-white font-bold text-lg">Add Food</h3>
-                  <p className="text-text-subtle text-xs font-medium mt-0.5">→ {MEAL_LABELS[mealType]}</p>
+                  <p className="text-text-subtle text-xs font-medium mt-0.5">â†’ {MEAL_LABELS[mealType]}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {/* Scanner toggle */}
+                                      {/* Recipes toggle */}
+                    {view === 'SEARCH' && (
+                      <button
+                        onClick={() => setView('RECIPES')}
+                        title="Log a saved recipe"
+                        className="w-9 h-9 rounded-full bg-surface border border-surface-edge flex items-center justify-center text-text-muted hover:text-primary hover:border-primary/40 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                      </button>
+                    )}
+                    {/* Scanner toggle */}
                   {view === 'SEARCH' && (
                     <button
                       onClick={() => setView('SCANNER')}
@@ -601,6 +711,16 @@ export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
                 />
               )}
 
+                            {/* View: Recipes */}
+              {view === 'RECIPES' && (
+                <RecipeListPanel
+                  mealType={mealType}
+                  date={date}
+                  onLogged={() => { onLogged(); onClose(); }}
+                  onClose={() => setView('SEARCH')}
+                />
+              )}
+
               {/* View: Manual Entry */}
               {view === 'MANUAL' && (
                 <ManualEntryPanel
@@ -625,7 +745,7 @@ export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
                     <input
                       ref={searchInputRef}
                       type="text"
-                      placeholder="Search food... (↑↓ to navigate)"
+                      placeholder="Search food... (â†‘â†“ to navigate)"
                       value={query}
                       autoComplete="off"
                       onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
@@ -669,7 +789,7 @@ export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
                           </>
                         ) : displayedResults.length === 0 && hasSearched ? (
                           <div className="flex flex-col items-center py-6 px-4 text-center gap-2">
-                            <span className="text-3xl">🔍</span>
+                            <span className="text-3xl">đŸ”</span>
                             <p className="text-white text-sm font-semibold">No results for "{query}"</p>
                             <p className="text-text-muted text-xs">Try a different spelling or shorter term</p>
                             <button
@@ -716,10 +836,10 @@ export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
                         {!isSearching && displayedResults.length > 0 && (
                           <div className="border-t border-surface-edge/30 px-4 py-2 flex gap-4 bg-surface/30">
                             <span className="text-text-muted text-[10px] flex items-center gap-1">
-                              <kbd className="bg-surface border border-surface-edge px-1 rounded text-[10px]">↑↓</kbd> Navigate
+                              <kbd className="bg-surface border border-surface-edge px-1 rounded text-[10px]">â†‘â†“</kbd> Navigate
                             </span>
                             <span className="text-text-muted text-[10px] flex items-center gap-1">
-                              <kbd className="bg-surface border border-surface-edge px-1 rounded text-[10px]">↵</kbd> Select
+                              <kbd className="bg-surface border border-surface-edge px-1 rounded text-[10px]">â†µ</kbd> Select
                             </span>
                             <span className="text-text-muted text-[10px] flex items-center gap-1">
                               <kbd className="bg-surface border border-surface-edge px-1 rounded text-[10px]">Esc</kbd> Clear
@@ -792,7 +912,7 @@ export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
                             <button
                               onClick={() => setQuantity((q) => Math.max(0.25, parseFloat((q - 0.25).toFixed(2))))}
                               className="w-8 h-8 rounded-full border border-surface-edge bg-surface text-white font-bold hover:border-primary transition-colors flex items-center justify-center"
-                            >−</button>
+                            >âˆ’</button>
                             <input
                               type="number"
                               min="0.25"
@@ -829,3 +949,5 @@ export const FoodSearchModal: React.FC<FoodSearchModalProps> = ({
     </AnimatePresence>
   );
 };
+
+

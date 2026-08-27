@@ -359,6 +359,7 @@ export const api = {
     createComment: (postId: string, content: string): Promise<any> =>
       request(`/api/community/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ content }) }),
     getSubCommunities: (): Promise<BackendSubCommunity[]> => request<BackendSubCommunity[]>('/api/community/groups'),
+    getMySubCommunities: (): Promise<BackendSubCommunity[]> => request<BackendSubCommunity[]>('/api/community/groups/me'),
     createSubCommunity: (data: { name: string; description?: string }): Promise<BackendSubCommunity> =>
       request('/api/community/groups', { method: 'POST', body: JSON.stringify(data) }),
     joinSubCommunity: (id: string): Promise<any> =>

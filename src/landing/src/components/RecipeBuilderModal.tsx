@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
 import type { FoodSearchResult } from '../lib/api';
 
@@ -165,11 +165,11 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-2xl bg-white rounded-[2rem] shadow-2xl flex flex-col max-h-[92vh] border border-gray-200 overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-surface rounded-[2rem] shadow-2xl flex flex-col max-h-[92vh] border border-surface-edge overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-          <h2 className="text-xl font-bold text-gray-900">Create Recipe</h2>
-          <button onClick={onClose} className="p-2 text-gray-500 hover:text-gray-800 bg-gray-100 rounded-full">
+        <div className="px-6 py-4 border-b border-surface-edge flex justify-between items-center bg-surface-alt">
+          <h2 className="text-xl font-bold text-white">Create Recipe</h2>
+          <button onClick={onClose} className="p-2 text-text-muted hover:text-gray-200 bg-surface-edge rounded-full">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -185,12 +185,12 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
           {/* Basic Info */}
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Recipe Name *</label>
+              <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">Recipe Name *</label>
               <input
                 type="text"
                 value={recipeName}
                 onChange={e => setRecipeName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-primary focus:bg-white outline-none"
+                className="w-full bg-surface-alt border border-surface-edge rounded-xl px-4 py-3 text-white focus:border-primary focus:bg-surface outline-none"
                 placeholder="e.g., Protein Oatmeal"
               />
             </div>
@@ -198,22 +198,22 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
             {/* Servings */}
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Number of Servings</label>
+                <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">Number of Servings</label>
                 <input
                   type="number"
                   min={1}
                   value={servings}
                   onChange={e => setServings(Number(e.target.value))}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-primary focus:bg-white outline-none"
+                  className="w-full bg-surface-alt border border-surface-edge rounded-xl px-4 py-3 text-white focus:border-primary focus:bg-surface outline-none"
                   placeholder="1"
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Visibility</label>
+                <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">Visibility</label>
                 <select
                   value={status}
                   onChange={e => setStatus(e.target.value as any)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-primary outline-none"
+                  className="w-full bg-surface-alt border border-surface-edge rounded-xl px-4 py-3 text-white focus:border-primary outline-none"
                 >
                   <option value="PRIVATE">Private (Only me)</option>
                   <option value="PENDING">Submit to Community</option>
@@ -222,43 +222,43 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Instructions *</label>
+              <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">Instructions *</label>
               <textarea
                 value={instructions}
                 onChange={e => setInstructions(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:border-primary focus:bg-white outline-none h-28 resize-none"
-                placeholder="Step 1: …&#10;Step 2: …&#10;Step 3: …"
+                className="w-full bg-surface-alt border border-surface-edge rounded-xl px-4 py-3 text-white focus:border-primary focus:bg-surface outline-none h-28 resize-none"
+                placeholder="Step 1: â€¦&#10;Step 2: â€¦&#10;Step 3: â€¦"
               />
             </div>
 
             {/* Image Upload */}
             <div>
-              <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                 Recipe Image {status === 'PENDING' && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+                className="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-500/10 file:text-emerald-400 hover:file:bg-emerald-500/20 cursor-pointer"
               />
               {status === 'PENDING' && !image && (
                 <p className="text-xs text-red-500 mt-1">An image is required for community recipes.</p>
               )}
               {image && (
-                <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden bg-gray-50 max-h-48 flex items-center justify-center">
+                <div className="mt-4 border border-surface-edge rounded-xl overflow-hidden bg-surface-alt max-h-48 flex items-center justify-center">
                   <img src={image} alt="Preview" className="max-h-48 object-contain" />
                 </div>
               )}
             </div>
           </div>
 
-          <hr className="border-gray-200" />
+          <hr className="border-surface-edge" />
 
           {/* Ingredients */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Ingredients *</label>
+              <label className="text-xs font-semibold text-text-muted uppercase tracking-wider">Ingredients *</label>
               <button
                 type="button"
                 onClick={() => setShowManualEntry(v => !v)}
@@ -272,21 +272,21 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
             {ingredients.length > 0 && (
               <div className="mb-4 space-y-1.5">
                 {ingredients.map((ing, idx) => (
-                  <div key={idx} className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3">
+                  <div key={idx} className="flex items-center gap-3 bg-surface-alt border border-surface-edge rounded-xl p-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 font-medium truncate">{getIngLabel(ing)}</p>
-                      <p className="text-xs text-gray-500">{getIngCal(ing)} kcal
-                        {ing.type === 'manual' && <span className="ml-1 text-amber-600">· User-entered</span>}
+                      <p className="text-sm text-white font-medium truncate">{getIngLabel(ing)}</p>
+                      <p className="text-xs text-text-muted">{getIngCal(ing)} kcal
+                        {ing.type === 'manual' && <span className="ml-1 text-amber-600">Â· User-entered</span>}
                       </p>
                     </div>
                     <input
                       type="text"
                       value={ing.quantity}
                       onChange={e => updateQuantity(idx, e.target.value)}
-                      className="w-24 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-900 focus:border-primary outline-none"
+                      className="w-24 bg-surface border border-surface-edge rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary outline-none"
                       placeholder="Qty"
                     />
-                    <button onClick={() => removeIngredient(idx)} className="p-1.5 text-gray-400 hover:text-red-600 bg-white border border-gray-100 rounded-lg">
+                    <button onClick={() => removeIngredient(idx)} className="p-1.5 text-text-subtle hover:text-red-600 bg-surface border border-surface-edge rounded-lg">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
@@ -301,12 +301,12 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
               <div className="mb-4 bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3">
                 <p className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Manual Ingredient Entry</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <input type="text" value={manualName} onChange={e => setManualName(e.target.value)} placeholder="Ingredient name" className="col-span-2 bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-amber-400" />
-                  <input type="text" value={manualQty} onChange={e => setManualQty(e.target.value)} placeholder="Quantity (e.g. 100g)" className="bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-amber-400" />
-                  <input type="number" value={manualCal} onChange={e => setManualCal(e.target.value)} placeholder="Calories" className="bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-amber-400" />
-                  <input type="number" value={manualPro} onChange={e => setManualPro(e.target.value)} placeholder="Protein (g)" className="bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-amber-400" />
-                  <input type="number" value={manualCarb} onChange={e => setManualCarb(e.target.value)} placeholder="Carbs (g)" className="bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-amber-400" />
-                  <input type="number" value={manualFat} onChange={e => setManualFat(e.target.value)} placeholder="Fat (g)" className="col-span-2 bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-gray-900 outline-none focus:border-amber-400" />
+                  <input type="text" value={manualName} onChange={e => setManualName(e.target.value)} placeholder="Ingredient name" className="col-span-2 bg-surface border border-amber-200 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-amber-400" />
+                  <input type="text" value={manualQty} onChange={e => setManualQty(e.target.value)} placeholder="Quantity (e.g. 100g)" className="bg-surface border border-amber-200 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-amber-400" />
+                  <input type="number" value={manualCal} onChange={e => setManualCal(e.target.value)} placeholder="Calories" className="bg-surface border border-amber-200 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-amber-400" />
+                  <input type="number" value={manualPro} onChange={e => setManualPro(e.target.value)} placeholder="Protein (g)" className="bg-surface border border-amber-200 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-amber-400" />
+                  <input type="number" value={manualCarb} onChange={e => setManualCarb(e.target.value)} placeholder="Carbs (g)" className="bg-surface border border-amber-200 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-amber-400" />
+                  <input type="number" value={manualFat} onChange={e => setManualFat(e.target.value)} placeholder="Fat (g)" className="col-span-2 bg-surface border border-amber-200 rounded-xl px-3 py-2 text-sm text-white outline-none focus:border-amber-400" />
                 </div>
                 <button
                   type="button"
@@ -325,33 +325,33 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search food database to add ingredient…"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-900 focus:border-primary focus:bg-white outline-none"
+                placeholder="Search food database to add ingredientâ€¦"
+                className="w-full bg-surface-alt border border-surface-edge rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:border-primary focus:bg-surface outline-none"
               />
-              <svg className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="absolute left-3.5 top-3.5 w-4 h-4 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
 
               {(searchQuery || isSearching) && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-10 max-h-52 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-surface-edge rounded-xl shadow-xl overflow-hidden z-10 max-h-52 overflow-y-auto">
                   {isSearching ? (
-                    <div className="p-4 text-center text-sm text-gray-400">Searching…</div>
+                    <div className="p-4 text-center text-sm text-text-subtle">Searchingâ€¦</div>
                   ) : searchResults.length > 0 ? (
                     searchResults.map(result => (
                       <button
                         key={result.id}
                         onClick={() => addFromDB(result)}
-                        className="w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors flex justify-between items-center"
+                        className="w-full text-left px-4 py-3 border-b border-surface-edge hover:bg-surface-alt transition-colors flex justify-between items-center"
                       >
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{result.name}</p>
-                          <p className="text-xs text-gray-400">{result.brand || 'Generic'} · {result.servingSize}</p>
+                          <p className="text-sm font-medium text-white">{result.name}</p>
+                          <p className="text-xs text-text-subtle">{result.brand || 'Generic'} Â· {result.servingSize}</p>
                         </div>
                         <p className="text-xs font-semibold text-primary-dark ml-2 shrink-0">{Math.round(result.calories)} kcal</p>
                       </button>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-sm text-gray-400">
+                    <div className="p-4 text-center text-sm text-text-subtle">
                       No results.{' '}
                       <button
                         className="text-primary-dark font-semibold hover:underline"
@@ -368,18 +368,18 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
         </div>
 
         {/* Footer: Macro Summary + Save */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="px-6 py-4 border-t border-surface-edge bg-surface-alt">
           {/* Per-serving macros */}
           <div className="flex gap-4 mb-4">
             {[
-              { label: 'Per Serving — Cal',   val: Math.round(perServing.calories) },
+              { label: 'Per Serving â€” Cal',   val: Math.round(perServing.calories) },
               { label: 'Protein',              val: `${Math.round(perServing.protein)}g` },
               { label: 'Carbs',                val: `${Math.round(perServing.carbs)}g` },
               { label: 'Fat',                  val: `${Math.round(perServing.fat)}g` },
             ].map(m => (
               <div key={m.label} className="flex-1 text-center">
-                <p className="text-xs text-gray-500 uppercase font-semibold truncate">{m.label}</p>
-                <p className="text-sm font-black text-gray-800">{m.val}</p>
+                <p className="text-xs text-text-muted uppercase font-semibold truncate">{m.label}</p>
+                <p className="text-sm font-black text-gray-200">{m.val}</p>
               </div>
             ))}
           </div>
@@ -387,7 +387,7 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
           <button
             onClick={handleSave}
             disabled={isSubmitting || ingredients.length === 0}
-            className="w-full bg-primary text-gray-900 font-bold py-3 rounded-xl hover:bg-primary-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2 border border-primary-dark/15"
+            className="w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2 border border-primary-dark/15"
           >
             {isSubmitting && (
               <div className="w-4 h-4 border-2 border-gray-900/30 border-t-gray-900 rounded-full animate-spin" />
@@ -399,3 +399,4 @@ export const RecipeBuilderModal: React.FC<RecipeBuilderModalProps> = ({ isOpen, 
     </div>
   );
 };
+

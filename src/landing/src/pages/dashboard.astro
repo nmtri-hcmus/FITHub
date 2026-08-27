@@ -2,6 +2,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { DashboardGreeting } from '../components/DashboardGreeting';
 import { ProgressTracker } from '../components/ProgressTracker';
+
+import foodDiaryIcon from '../assets/food-diary.log-food.svg?raw';
+import weeklyPlanIcon from '../assets/weekly-plan.diet-plan.svg?raw';
+import recipesIcon from '../assets/recipes.svg?raw';
 ---
 
 <BaseLayout 
@@ -31,8 +35,8 @@ import { ProgressTracker } from '../components/ProgressTracker';
           class="flex items-center justify-between bg-surface-alt hover:bg-surface border border-surface-edge hover:border-primary/30 rounded-2xl p-5 group transition-all"
         >
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl">
-              🍽️
+            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary [&>svg]:w-6 [&>svg]:h-6">
+              <Fragment set:html={foodDiaryIcon} />
             </div>
             <div>
               <p class="text-white font-bold">Food Diary</p>
@@ -47,8 +51,8 @@ import { ProgressTracker } from '../components/ProgressTracker';
           class="flex items-center justify-between bg-surface-alt hover:bg-surface border border-surface-edge hover:border-primary/30 rounded-2xl p-5 group transition-all"
         >
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl">
-              📅
+            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary [&>svg]:w-6 [&>svg]:h-6">
+              <Fragment set:html={weeklyPlanIcon} />
             </div>
             <div>
               <p class="text-white font-bold">Weekly Plan</p>
@@ -63,8 +67,8 @@ import { ProgressTracker } from '../components/ProgressTracker';
           class="flex items-center justify-between bg-surface-alt hover:bg-surface border border-surface-edge hover:border-primary/30 rounded-2xl p-5 group transition-all"
         >
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl">
-              🍳
+            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary [&>svg]:w-6 [&>svg]:h-6">
+              <Fragment set:html={recipesIcon} />
             </div>
             <div>
               <p class="text-white font-bold">Recipes</p>

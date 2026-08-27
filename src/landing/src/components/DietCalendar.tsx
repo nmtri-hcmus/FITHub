@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { api, getISOWeek, getMondayOfWeek } from '../lib/api';
 import type { DietCalendarEntry, MealType, Recipe, FoodSearchResult } from '../lib/api';
 import { RecipeCard } from './RecipeCard';
@@ -9,16 +9,16 @@ interface DietCalendarProps {
 }
 
 const MEAL_LABELS: Record<MealType, string> = {
-  BREAKFAST: '🌅 Breakfast',
-  LUNCH:     '☀️ Lunch',
-  DINNER:    '🌙 Dinner',
-  SNACK:     '🍎 Snack',
+  BREAKFAST: 'đŸŒ… Breakfast',
+  LUNCH:     'â˜€ï¸ Lunch',
+  DINNER:    'đŸŒ™ Dinner',
+  SNACK:     'đŸ Snack',
 };
 
 const todayWeek = getISOWeek(new Date());
 
 function isPastWeek(weekStr: string): boolean {
-  // Compare ISO week strings lexicographically — works because YYYY-Www format is sortable
+  // Compare ISO week strings lexicographically â€” works because YYYY-Www format is sortable
   return weekStr < todayWeek;
 }
 
@@ -162,7 +162,7 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
   const dateToDate = (dateStr: string) => new Date(dateStr + 'T12:00:00');
 
   const getEntry = (date: Date, mealType: MealType) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = toLocalDate(date);
     return entries.find(e => e.date.startsWith(dateStr) && e.mealType === mealType);
   };
 
@@ -186,7 +186,7 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
         <div className="text-center">
           <h2 className="text-base font-bold text-white">
             {monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            {' — '}
+            {' â€” '}
             {days[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </h2>
           <p className="text-xs text-text-muted mt-0.5">{currentWeek}</p>
@@ -214,15 +214,15 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
         </div>
       ) : (
         <>
-          {/* ── DESKTOP: 8-col grid (hidden on mobile) ── */}
+          {/* â”€â”€ DESKTOP: 8-col grid (hidden on mobile) â”€â”€ */}
           <div className="hidden md:block overflow-x-auto pb-4">
             <div className="min-w-[700px] grid grid-cols-8 gap-3">
               {/* Top-left empty */}
               <div />
               {/* Day headers */}
               {days.map((d, i) => {
-                const todayStr = new Date().toISOString().split('T')[0];
-                const isToday = d.toISOString().split('T')[0] === todayStr;
+                const todayStr = toLocalDate(new Date());
+                const isToday = toLocalDate(d) === todayStr;
                 return (
                   <div key={i} className={`text-center p-2.5 rounded-xl border ${isToday ? 'bg-primary/10 border-primary/30' : 'bg-surface-alt border-surface-edge'}`}>
                     <p className="text-[10px] text-text-subtle uppercase font-semibold tracking-wider">
@@ -241,7 +241,7 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
                   </div>
                   {days.map((d, i) => {
                     const entry = getEntry(d, meal);
-                    const dateStr = d.toISOString().split('T')[0];
+                    const dateStr = toLocalDate(d);
                     return (
                       <div
                         key={`${meal}-${i}`}
@@ -288,11 +288,11 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
             </div>
           </div>
 
-          {/* ── MOBILE: Stacked day-by-day cards ── */}
+          {/* â”€â”€ MOBILE: Stacked day-by-day cards â”€â”€ */}
           <div className="md:hidden space-y-3">
             {days.map((d, dayIdx) => {
-              const todayStr = new Date().toISOString().split('T')[0];
-              const dateStr = d.toISOString().split('T')[0];
+              const todayStr = toLocalDate(new Date());
+              const dateStr = toLocalDate(d);
               const isToday = dateStr === todayStr;
               return (
                 <div key={dayIdx} className={`rounded-2xl border overflow-hidden ${isToday ? 'border-primary/30' : 'border-surface-edge'}`}>
@@ -346,7 +346,7 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
                                   Add meal
                                 </button>
                               ) : (
-                                <span className="text-xs text-text-subtle italic">—</span>
+                                <span className="text-xs text-text-subtle italic">â€”</span>
                               )
                             )}
                           </div>
@@ -361,12 +361,12 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
         </>
       )}
 
-      {/* ── Conflict Dialog (slot already filled) ── */}
+      {/* â”€â”€ Conflict Dialog (slot already filled) â”€â”€ */}
       {schedulingSlot && conflictMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSchedulingSlot(null)} />
           <div className="relative w-full max-w-sm bg-surface rounded-[2rem] shadow-2xl border border-surface-edge p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4 text-2xl">⚠️</div>
+            <div className="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4 text-2xl">â ï¸</div>
             <h3 className="text-lg font-bold text-white mb-2">Slot Already Filled</h3>
             <p className="text-text-muted text-sm mb-1">
               <strong className="text-white">{schedulingSlot.existingEntry?.recipe.recipeName}</strong>
@@ -392,7 +392,7 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
         </div>
       )}
 
-      {/* ── Scheduling Modal (recipe / food picker) ── */}
+      {/* â”€â”€ Scheduling Modal (recipe / food picker) â”€â”€ */}
       {schedulingSlot && !conflictMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSchedulingSlot(null)} />
@@ -420,7 +420,7 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
                 </svg>
                 <input
                   type="text"
-                  placeholder={schedulerTab === 'FOOD' ? 'Search food database…' : 'Search recipes by name…'}
+                  placeholder={schedulerTab === 'FOOD' ? 'Search food databaseâ€¦' : 'Search recipes by nameâ€¦'}
                   value={schedulerSearch}
                   onChange={e => setSchedulerSearch(e.target.value)}
                   className="w-full bg-surface border border-surface-edge rounded-xl pl-9 pr-4 py-2.5 text-sm text-white focus:border-primary outline-none"
@@ -446,19 +446,19 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6">
               {isRecipesLoading ? (
-                <div className="flex justify-center py-12 text-text-muted text-sm">Loading…</div>
+                <div className="flex justify-center py-12 text-text-muted text-sm">Loadingâ€¦</div>
               ) : schedulerTab === 'FOOD' ? (
                 /* Food DB results */
                 <div>
                   {isFoodSearching ? (
-                    <div className="text-center text-text-muted text-sm py-8">Searching…</div>
+                    <div className="text-center text-text-muted text-sm py-8">Searchingâ€¦</div>
                   ) : foodResults.length > 0 ? (
                     <div className="space-y-2">
                       {foodResults.map(food => (
                         <button
                           key={food.id}
                           onClick={() => {
-                            // Schedule as a single-food entry — need a recipe wrapper
+                            // Schedule as a single-food entry â€” need a recipe wrapper
                             // For now, we'll just close and inform user to log via Food Diary
                             alert(`To log "${food.name}" as a meal, please use the Food Diary page (Log Food). The diet calendar currently supports recipe-based scheduling.`);
                           }}
@@ -466,7 +466,7 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
                         >
                           <div>
                             <p className="text-sm font-semibold text-white">{food.name}</p>
-                            <p className="text-xs text-text-muted">{food.brand || 'Generic'} · {food.servingSize}</p>
+                            <p className="text-xs text-text-muted">{food.brand || 'Generic'} Â· {food.servingSize}</p>
                           </div>
                           <p className="text-xs font-bold text-primary">{Math.round(food.calories)} kcal</p>
                         </button>
@@ -515,3 +515,4 @@ export const DietCalendar: React.FC<DietCalendarProps> = ({ currentWeek, onWeekC
     </div>
   );
 };
+
