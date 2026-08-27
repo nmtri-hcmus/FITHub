@@ -167,7 +167,7 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
                 onChange={(e) => setSpecialty(e.target.value)}
                 className="w-full bg-surface border border-surface-edge rounded-xl px-4 py-3 text-white placeholder-text-disabled focus:border-primary focus:outline-none transition-colors text-sm"
               />
->>>>>>> Stashed changes
+
             </div>
 
             {/* Monthly Rate */}

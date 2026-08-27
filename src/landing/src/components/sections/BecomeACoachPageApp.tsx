@@ -39,6 +39,13 @@ export const BecomeACoachPageApp: React.FC = () => {
 
   if (!mounted) return null;
 
+  // Not logged in
+  if (!userRole) {
+    return (
+      <div className="min-h-screen bg-[#13141c] text-white flex flex-col items-center justify-center gap-6 px-4 py-20">
+        <span className="text-6xl">🔒</span>
+        <h1 className="text-3xl font-extrabold text-center">Login Required</h1>
+        <p className="text-text-subtle text-center max-w-md">
           Join our network of certified personal trainers. Apply by uploading your certifications for review.
         </p>
         <a

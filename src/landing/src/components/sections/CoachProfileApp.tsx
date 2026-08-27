@@ -60,8 +60,36 @@ const StarRating: React.FC<{ value: number; onChange?: (v: number) => void; read
 interface Props { coachId: string | undefined; }
 
 export const CoachProfileApp: React.FC<Props> = ({ coachId }) => {
+  const [coach, setCoach] = useState<BackendCoachProfile | null>(null);
+  const [reviews, setReviews] = useState<BackendCoachReview[]>([]);
+  const [consultations, setConsultations] = useState<BackendConsultation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [hasSubscribed, setHasSubscribed] = useState(false);
+
+  // Review state
+  const [rating, setRating] = useState(5);
+  const [reviewText, setReviewText] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+
+  // Consultation booking state
+  const [bookingDate, setBookingDate] = useState('');
+  const [bookingTime, setBookingTime] = useState('');
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+
+  // Resolve coachId from URL if not passed as prop
+  const resolvedCoachId = coachId ?? (typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('id') ?? undefined
+    : undefined);
+
+  const loadData = useCallback(async () => {
     if (!resolvedCoachId) return;
     setLoading(true);
+
     try {
       const profile = await api.coaches.getProfile(resolvedCoachId);
       setCoach(profile);
@@ -86,6 +114,7 @@ export const CoachProfileApp: React.FC<Props> = ({ coachId }) => {
   }, [resolvedCoachId]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
