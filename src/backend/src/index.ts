@@ -20,8 +20,11 @@ import jwt from 'jsonwebtoken';
 import cron from 'node-cron';
 import { ChatService } from './services/chat.service';
 import { LeaderboardService } from './services/leaderboard.service';
+import './config/passport';
+import passport from 'passport';
 
 const app = express();
+app.use(passport.initialize());
 const httpServer = createServer(app);
 
 // Allowed origins: reads from FRONTEND_URL env var in production, falls back to localhost for local dev

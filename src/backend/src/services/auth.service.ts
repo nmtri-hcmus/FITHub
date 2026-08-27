@@ -49,7 +49,7 @@ export class AuthService {
   }
 
   // Helper method to generate both tokens
-  private static async generateTokens(user: User) {
+  static async generateTokens(user: User) {
     const accessToken = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '15m' });
     const refreshToken = jwt.sign(
       { id: user.id, jti: crypto.randomUUID() },

@@ -3,10 +3,12 @@ import jwt from 'jsonwebtoken';
 
 import { prisma } from '../lib/prisma';
 
-// Extend the Express Request type so we can attach the user's ID to it
-export interface AuthRequest extends Request {
-  user?: { id: string; role: string };
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: { id: string; role: string } | any;
+  }
 }
+export type AuthRequest = Request;
 
 export const requireAuth = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   const authHeader = req.headers.authorization;

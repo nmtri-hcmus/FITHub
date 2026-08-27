@@ -45,4 +45,25 @@ export class AuthController {
       res.status(401).json({ error: error.message });
     }
   }
+
+  static async googleCallback(req: Request, res: Response) {
+    try {
+      // req.user is populated by Passport Google Strategy
+      const user = req.user as any;
+      if (!user) {
+        throw new Error('OAuth authentication failed');
+      }
+
+      // Generate the same tokens as standard login
+      const result = await AuthService.generateTokens(user);
+      
+      // Redirect to the frontend dashboard with tokens in URL parameters
+      // In a real production app, we'd use httpOnly cookies, but for this project we'll pass via URL
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4321';
+      res.redirect(`${frontendUrl}/dashboard?token=${result.accessToken}&refreshToken=${result.refreshToken}`);
+    } catch (error: any) {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4321';
+      res.redirect(`${frontendUrl}/login?error=oauth_failed`);
+    }
+  }
 }
