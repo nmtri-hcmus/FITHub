@@ -48,15 +48,15 @@ export const MacroRing: React.FC<MacroRingProps> = ({ consumed, target, label = 
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={`text-2xl font-black ${isOver ? 'text-red-400' : 'text-primary'}`}>
-            {consumed.toLocaleString()}
+            {consumed?.toLocaleString() ?? 0}
           </span>
           <span className="text-xs text-text-subtle font-semibold">{label}</span>
         </div>
       </div>
       <div className="mt-3 text-center">
-        <p className="text-white font-bold text-sm">{target.toLocaleString()} kcal target</p>
+        <p className="text-white font-bold text-sm">{target?.toLocaleString() ?? 0} kcal target</p>
         <p className={`text-xs font-medium mt-0.5 ${isOver ? 'text-red-400' : 'text-text-muted'}`}>
-          {isOver ? `${(consumed - target).toLocaleString()} over` : `${remaining.toLocaleString()} remaining`}
+          {isOver ? `${(consumed - (target || 0)).toLocaleString()} over` : `${remaining?.toLocaleString() ?? 0} remaining`}
         </p>
       </div>
     </div>

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api, type BackendCoachApplication, type Recipe } from '../../lib/api';
 
 // ── Badge counts ───────────────────────────────────────────────────────────────

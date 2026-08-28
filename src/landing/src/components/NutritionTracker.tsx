@@ -7,7 +7,7 @@ import { MealSection } from './MealSection';
 
 const MEAL_TYPES: MealType[] = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
-const todayStr = () => toLocalDate(new Date());
+const todayStr = () => new Date().toISOString().split('T')[0];
 
 const toLocalDate = (d: Date | string) => {
   const date = typeof d === 'string' ? new Date(d) : d;

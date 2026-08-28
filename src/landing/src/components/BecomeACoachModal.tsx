@@ -34,25 +34,31 @@ export const BecomeACoachModal: React.FC<BecomeACoachModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     setLoadingExisting(true);
+    let currentUserIsCoach = false;
     const userStr = localStorage.getItem('fithub_user');
     if (userStr) {
       const user = JSON.parse(userStr);
       if (user.role === 'COACH') {
         setIsCoach(true);
+        currentUserIsCoach = true;
       }
     }
 
-    api.coaches.getMyProfile()
-      .then((profile) => {
-        if (profile) {
-          setExistingProfile(profile);
-          setSpecialty(profile.specialty);
-          setHourlyRate(String(profile.hourlyRate));
-          setBio(profile.bio ?? '');
-        }
-      })
-      .catch(() => { /* No profile yet */ })
-      .finally(() => setLoadingExisting(false));
+    if (currentUserIsCoach) {
+      api.coaches.getMyProfile()
+        .then((profile) => {
+          if (profile) {
+            setExistingProfile(profile);
+            setSpecialty(profile.specialty);
+            setHourlyRate(String(profile.hourlyRate));
+            setBio(profile.bio ?? '');
+          }
+        })
+        .catch(() => { /* No profile yet */ })
+        .finally(() => setLoadingExisting(false));
+    } else {
+      setLoadingExisting(false);
+    }
   }, [isOpen]);
 
   const handleIdFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

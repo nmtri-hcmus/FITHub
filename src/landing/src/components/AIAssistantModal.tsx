@@ -21,14 +21,7 @@ interface AIAssistantModalProps {
   onLogged: () => void;
 }
 
-const toLocalDate = (d: Date | string) => {
-  const date = typeof d === 'string' ? new Date(d) : d;
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-    .toISOString()
-    .split('T')[0];
-};
-
-const todayStr = () => toLocalDate(new Date());
+const todayStr = () => new Date().toISOString().split('T')[0];
 
 export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
   isOpen,

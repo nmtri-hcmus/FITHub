@@ -289,7 +289,7 @@ const RecipeListPanel: React.FC<RecipeListPanelProps> = ({ mealType, date, onLog
         </button>
         <div>
           <h4 className="text-white font-bold text-sm">Log a Recipe</h4>
-          <p className="text-text-subtle text-xs">Choose from your saved recipes</p>
+          <p className="text-text-subtle text-xs">Choose from your saved meals</p>
         </div>
       </div>
 
@@ -319,8 +319,8 @@ const RecipeListPanel: React.FC<RecipeListPanelProps> = ({ mealType, date, onLog
                 </button>
               </div>
               <div className="flex items-center gap-4 text-xs font-medium">
-                <span className="text-blue-400">P: {recipe.protein}g</span>
-                <span className="text-yellow-400">C: {recipe.carbs}g</span>
+                <span className="text-emerald-400">P: {recipe.protein}g</span>
+                <span className="text-amber-400">C: {recipe.carbs}g</span>
                 <span className="text-orange-400">F: {recipe.fat}g</span>
               </div>
             </div>

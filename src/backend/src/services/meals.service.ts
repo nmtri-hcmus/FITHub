@@ -37,9 +37,11 @@ export const MealsService = {
    * Get all meals for a user on a specific date
    */
   async getDailyMeals(userId: string, dateStr: string) {
-    // dateStr is 'YYYY-MM-DD'
-    const startOfDay = new Date(`${dateStr}T00:00:00Z`);
-    const endOfDay = new Date(`${dateStr}T23:59:59.999Z`);
+    const date = new Date(dateStr);
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
 
     return prisma.mealLog.findMany({
       where: {

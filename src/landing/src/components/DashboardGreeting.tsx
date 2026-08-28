@@ -1,13 +1,20 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import type { BiometricsResponse } from '../lib/api';
 import { api } from '../lib/api';
 import { AIAssistantModal } from './AIAssistantModal';
 
+const toLocalDate = (d: Date | string) => {
+  const date = typeof d === 'string' ? new Date(d) : d;
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split('T')[0];
+};
+
 const GOAL_DISPLAY: Record<string, string> = {
-  LOSE_WEIGHT: 'đŸ”¥ Cutting â€” Fat Loss',
-  MAINTAIN: 'â–ï¸ Maintaining â€” Body Recomp',
-  BUILD_MUSCLE: 'đŸ’ª Bulking â€” Muscle Gain',
+  LOSE_WEIGHT: '🔥 Cutting — Fat Loss',
+  MAINTAIN: '⚖️ Maintaining — Body Recomp',
+  BUILD_MUSCLE: '💪 Bulking — Muscle Gain',
 };
 
 interface StatTileProps {
@@ -18,7 +25,7 @@ interface StatTileProps {
 }
 const StatTile: React.FC<StatTileProps> = ({ label, value, unit, color = 'text-primary' }) => (
   <div className="flex flex-col items-center justify-center bg-surface rounded-2xl border border-surface-edge p-5 gap-1">
-    <span className={`text-3xl font-black ${color}`}>{value.toLocaleString()}</span>
+    <span className={`text-3xl font-black ${color}`}>{value?.toLocaleString() ?? 0}</span>
     <span className="text-xs text-text-subtle uppercase tracking-wider font-semibold">{unit}</span>
     <span className="text-xs text-text-muted mt-1">{label}</span>
   </div>
@@ -115,7 +122,7 @@ const DashboardGreetingInner: React.FC = () => {
         <div className="absolute -top-8 -right-8 w-48 h-48 bg-primary/10 rounded-full blur-[50px] pointer-events-none" />
         <div className="relative z-10">
           <p className="text-text-subtle text-sm font-medium mb-1">Welcome back,</p>
-          <h2 className="text-3xl font-black text-white mb-3">{displayName} đŸ‘‹</h2>
+          <h2 className="text-3xl font-black text-white mb-3">{displayName} 👋</h2>
           <span className="inline-block text-sm font-semibold text-primary bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5">
             {goal}
           </span>
@@ -157,7 +164,7 @@ const DashboardGreetingInner: React.FC = () => {
         <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 rounded-full blur-[40px] pointer-events-none group-hover:bg-primary/20 transition-colors" />
         <div className="relative z-10 flex items-center gap-6">
           <div className="w-16 h-16 shrink-0 rounded-2xl bg-surface border border-surface-edge flex items-center justify-center text-3xl shadow-inner group-hover:scale-105 transition-transform">
-            âœ¨
+            ✨
           </div>
           <div>
             <h3 className="text-xl font-bold text-white mb-1">AI Recipe Assistant</h3>
@@ -166,7 +173,7 @@ const DashboardGreetingInner: React.FC = () => {
             </p>
           </div>
           <div className="ml-auto w-10 h-10 rounded-full bg-primary text-surface flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all">
-            â†’
+            →
           </div>
         </div>
       </button>

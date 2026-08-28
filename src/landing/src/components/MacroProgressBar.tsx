@@ -27,10 +27,10 @@ export const MacroProgressBar: React.FC<MacroProgressBarProps> = ({
         <span className={`text-xs font-bold uppercase tracking-wider ${color}`}>{label}</span>
         <span className="text-xs font-semibold text-text-muted">
           <span className={`font-bold ${isOver ? 'text-red-400' : 'text-white'}`}>
-            {consumed.toFixed(1)}
+            {consumed?.toFixed(1) ?? '0.0'}
           </span>
           {' / '}
-          {target.toFixed(0)}{unit}
+          {target?.toFixed(0) ?? '0'}{unit}
         </span>
       </div>
       <div className="h-2 bg-surface-edge rounded-full overflow-hidden">

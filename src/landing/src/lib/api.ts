@@ -255,6 +255,17 @@ export const api = {
     getMyApplication: (): Promise<BackendCoachApplication | null> =>
       request<BackendCoachApplication | null>('/api/coaches/apply/my-status'),
 
+    /** Get the authenticated coach's profile */
+    getMyProfile: (): Promise<BackendCoachProfile | null> =>
+      request<BackendCoachProfile | null>('/api/coaches/me'),
+
+    /** Create or update the authenticated coach's profile */
+    upsertMyProfile: (data: { specialty: string; hourlyRate: number; bio?: string }): Promise<BackendCoachProfile> =>
+      request<BackendCoachProfile>('/api/coaches/me', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
     /**
      * List all pending coach applications (Admin only).
      * Maps to GET /api/coaches/applications
